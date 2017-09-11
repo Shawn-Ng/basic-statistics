@@ -1,8 +1,8 @@
 # Time Series Analysis
 
-Content Author: **David S. Matteson**
-Site: https://www.datacamp.com/courses/introduction-to-time-series-analysis
-Editor: Shawn Ng
+Editor: Shawn Ng<br>
+Content Author: **David S. Matteson**<br>
+Site: https://www.datacamp.com/courses/introduction-to-time-series-analysis<br>
 
 1. [Exploratory time series data analysis](#1-exploratory-time-series-data-analysis)
 2. [Predicting the future](#2-predicting-the-future)

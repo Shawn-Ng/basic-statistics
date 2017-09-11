@@ -1,8 +1,8 @@
 # Forecasting Using R
 
-Content Author: **Rob J. Hyndman**
-Site: https://www.datacamp.com/courses/forecasting-using-r
-Editor: Shawn Ng
+Editor: Shawn Ng<br>
+Content Author: **Rob J. Hyndman**<br>
+Site: https://www.datacamp.com/courses/forecasting-using-r<br>
 
 ## 1. Exploring and visualizing time series in R
 ```r
