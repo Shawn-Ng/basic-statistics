@@ -139,6 +139,8 @@ model_wn$coef
 
 
 ### Stationary
+This means that the autocorrelation for any particular lag is the same regardless of where we are in time. Same mean, variance for all t. 
+
 - Are parsimonious
 - Has distributional stability over time
 
