@@ -4,6 +4,19 @@ https://www.datacamp.com/courses/introduction-to-time-series-analysis
 
 Disclaimer: All credits belong to **David S. Matteson**
 
+1. [Exploratory time series data analysis](#1-exploratory-time-series-data-analysis)
+2. [Predicting the future](#2-predicting-the-future)
+    1. [Trend](#trend)
+    2. [White noise (WN) model](#white-noise-wn-model)
+    3. [Random walk (RW) model](#random-walk-rw-model)
+    4. [Stationary](#stationary)
+3. [Correlation analysis and the autocorrelation function](#3-correlation-analysis-and-the-autocorrelation-function)
+    1. [Finanical time series](#financial-ts)
+    2. [Autocorrelation](#autocorrelation)
+4. [Autoregression (AR) model](#4-autoregression-ar-model)
+5. [Moving average (MA) model](#5-moving-average-ma-model)
+    1. [AR vs MA models](#ar-vs-ma-models)
+
 
 ## 1. Exploratory time series data analysis
 
