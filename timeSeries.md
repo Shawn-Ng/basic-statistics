@@ -55,13 +55,68 @@
         3. Back-transforming Forecasts
         4. [Bias Adjustments](#bias-adjustments)
 5. Residual Diagnostics
+    * Obs value - forecast/fitted value
+    * 1 step ahead forecast
+    * Residual also known as training error
+    * Residual values: `forecastData$residuals`
+    * Fitted values: `forecastData$fitted`
     1. Residual Properties
+        1. Essential
+            * Uncorrelated
+            * 0 mean
+        2. Useful
+            * Constant variance
+            * Normally distributed
+    * Properties not met -> forecast method can be improved
+    * Residual correlated -> ARIMA
+    * Residual with non 0 mean -> add mean to all forecast
+    * `checkresiduals(naive(forecastData),test=FALSE)`
     2. Portmanteau Tests
+        * Test of whether the first h autocorrelations, are significantly different from what would be expected from a white noise process
+        * `res <- residuals(naive(data))`
+        1. Box-Pierce test
+            * `Box.test(res, lag=10, fitdf=0)`
+        2. Ljung-Box test
+            * `Box.test(res, lag=10, fitdf=0, type="Lj")`
 6. Evaluating Forecast Accuracy
     1. Training and Test Sets
+        * Training data: Estimate the params of a model
+        * Test data: Evaluate model's accuracy
+        * Good fit to training data != model forecast well
+        * Enough params -> perfect fit, but don't overfit
     2. Error Metrics
+        * Forecast error: diff(obs value - forecast)
+        * Scale dependent error
+            1. Mean Absolute Error (MAE), low MAE -> optimal forecast of median
+            2. Root Mean Square Error (RMSE), low RMSE -> optimal forecast of mean
+        * Scale independent error
+            1. Mean Absolute Percentage Error (MAPE)
+                * If forecast ~ 0 -> extreme percentage error
+                * Heavier penalty on -ve than +ve error
+            2. Symmetric MAPE (sMAPE)
+                * Range from -200% to 200%
+                * Computationally unstable, could be negative
+            3. Scaled Error
+                * better than naive forecast -> <1
+                * worse than naive forecast -> >1
+        * ``` 
+            train <- window(timeSeriesData, end=100)
+            forecast <- meanf(train, h=10)
+            test <- window(timeSeriesData, start=101)
+            accuracy(forecast, test)
     3. Time Series Cross Validation
+        * More sophiscated version of training/test
+        * ``` 
+            e <- tsCV(timeSeriesData, rwf, drift=TRUE, h=1)
+            sqrt(mean(e^2, na.rm=TRUE))
+            sqrt(mean(residuals(rwf(timeSeriesData, drift=TRUE))^2, na.rm=TRUE))
 7. Prediction Intervals
+    * 1 step ahead forecast -> forecast dis sd = residuals sd
+    * No parameter estimated -> 2 sd identical
+    * Parameter estimated -> forecast dis sd > residuals sd
+    * Forecast horizon increase -> Prediction interval increase
+
+
 
 
 ### Time series patterns
