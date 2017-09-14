@@ -4,6 +4,13 @@ Editor: Shawn Ng<br>
 Content Author: **Rob J. Hyndman**<br>
 Site: https://www.datacamp.com/courses/forecasting-using-r<br>
 
+1. Exploring and visualizing time series in R
+2. Benchmark methods and forecast accuracy
+3. Exponential smoothing
+4. Forecasting with ARIMA models
+5. Advanced meth2d5 
+
+
 ## 1. Exploring and visualizing time series in R
 ```r
 autoplot(data)
@@ -123,8 +130,38 @@ mse <- colMeans(e^2, na.rm = TRUE)
 ```
 
 
-## 3. Exponential smoothing
 
+
+
+## 3. Exponential smoothing
+```r
+# ses(): simple exponential smoothing. The parameters are estimated using least squares estimation.
+# h: horizon, years
+fc <- ses(timeSeriesData, h=10)
+
+# smoothing parameters, alpha=0.3457 -> 34.57% of emphasis on latest data
+summary(fc)
+
+# Add 1 step forecast for training data
+autoplot(fc) + autolayer(fitted(fc))
+
+
+# SES VS NAIVE
+# x is the number of obs reserved for testing
+train <- subset(timeSeriesData, end=length(timeSeriesData)-x)
+
+fcSes <- naive(train, h=x)
+fcNaive <- ses(train, h=x)
+accuracy(fcSes)
+accuracy(fcNaive)
+
+
+# Holt's trend methods
+fcholt <- holt(timeSeriesData, h=x)
+summary(fcholt)
+autoplot(fcholt)
+checkresiduals(fcholt)
+```
 
 ## 4. Forecasting with ARIMA models
 
