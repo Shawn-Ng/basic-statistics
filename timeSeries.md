@@ -77,6 +77,7 @@
         1. Box-Pierce test
             * `Box.test(res, lag=10, fitdf=0)`
         2. Ljung-Box test
+            * p-value < 0.05 -> not white noise
             * `Box.test(res, lag=10, fitdf=0, type="Lj")`
 6. Evaluating Forecast Accuracy
     1. Training and Test Sets
@@ -84,7 +85,7 @@
         * Test data: Evaluate model's accuracy
         * Good fit to training data != model forecast well
         * Enough params -> perfect fit, but don't overfit
-    2. Error Metrics
+    2. [Error Metrics](#error-metrics)
         * Forecast error: diff(obs value - forecast)
         * Scale dependent error
             1. Mean Absolute Error (MAE), low MAE -> optimal forecast of median
@@ -99,17 +100,8 @@
             3. Scaled Error
                 * better than naive forecast -> <1
                 * worse than naive forecast -> >1
-        * ``` 
-            train <- window(timeSeriesData, end=100)
-            forecast <- meanf(train, h=10)
-            test <- window(timeSeriesData, start=101)
-            accuracy(forecast, test)
-    3. Time Series Cross Validation
+    3. [Time Series Cross Validation](#time-series-cross-validation)
         * More sophiscated version of training/test
-        * ``` 
-            e <- tsCV(timeSeriesData, rwf, drift=TRUE, h=1)
-            sqrt(mean(e^2, na.rm=TRUE))
-            sqrt(mean(residuals(rwf(timeSeriesData, drift=TRUE))^2, na.rm=TRUE))
 7. Prediction Intervals
     * 1 step ahead forecast -> forecast dis sd = residuals sd
     * No parameter estimated -> 2 sd identical
@@ -160,4 +152,21 @@ fc <- rwf(timeSeriesData, drift=T, lambda=0, h=50)
 fc2 <- rwf(timeSeriesData, drift=T, lambda=0, h=50, biasadj=T)
 plot(fc)
 lines(fc2$mean)
+```
+
+
+## Error Metrics
+```r
+train <- window(timeSeriesData, end=100)
+forecast <- meanf(train, h=10)
+test <- window(timeSeriesData, start=101)
+accuracy(forecast, test)
+```
+
+
+## Time Series Cross Validation
+```r
+e <- tsCV(timeSeriesData, rwf, drift=TRUE, h=1)
+sqrt(mean(e^2, na.rm=TRUE))
+sqrt(mean(residuals(rwf(timeSeriesData, drift=TRUE))^2, na.rm=TRUE))
 ```
