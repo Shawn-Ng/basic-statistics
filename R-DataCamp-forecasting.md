@@ -200,6 +200,10 @@ summary(fit)
 fit %>% forecast(h=20) %>% autoplot()
 ```
 
+
+
+
+
 ## 4. Forecasting with ARIMA models
 ```r
 # 1. Box-Cox transformations
@@ -340,6 +344,91 @@ accuracy(fc1, timeSeriesData)
 accuracy(fc2, timeSeriesData)
 ```
 
+
+
+
+
 ## 5. Advanced methods
+### Forecasting sales allowing for advertising expenditure
+```r
+# Time plot of both variables
+autoplot(advert, facets = TRUE)
+
+# Fit ARIMA model
+fit <- auto.arima(advert[, "sales"], xreg = advert[, "advert"], stationary = TRUE)
+
+# Check model. Increase in sales for each unit increase in advertising
+salesincrease <- fit$coef[3]
+
+# Forecast fit as fc
+fc <- forecast(fit, xreg = rep(10,6))
+
+# Plot fc with x and y labels
+autoplot(fc) + xlab("Month") + ylab("Sales")
+```
+
+### Forecasting weekly data
+With weekly data, it is difficult to handle seasonality using ETS or ARIMA models as the seasonal length is too large (approximately 52). Instead, you can use harmonic regression which uses sines and cosines to model the seasonality.
+```r
+# Set up harmonic regressors of order 13
+harmonics <- fourier(timeSeriesData, K = 13)
+
+# Fit regression model with ARIMA errors
+fit <- auto.arima(timeSeriesData, xreg = harmonics, seasonal = FALSE)
+
+# Forecasts next 3 years
+newharmonics <- fourier(timeSeriesData, K = 13, h = 3*52)
+fc <- forecast(fit, xreg = newharmonics)
+
+# Plot forecasts fc
+autoplot(fc)
+```
+
+### Harmonic regression for multiple seasonality
+Harmonic regressions are also useful when time series have multiple seasonal patterns. `auto.arima()` would take a long time to fit a long time series. Instead you will fit a standard regression model with Fourier terms using the `tslm()` function
+```r
+# Fit a harmonic regression using order 10 for each type of seasonality
+fit <- tslm(multiSeasonalTS ~ fourier(multiSeasonalTS, K = c(10, 10)))
+
+# Forecast 20 working days ahead, data is half hour
+fc <- forecast(fit, newdata = data.frame(fourier(multiSeasonalTS, K = c(10, 10), h = 20*24*2)))
+
+# Plot the forecasts
+autoplot(fc)
+
+# Check the residuals of fit
+checkresiduals(fit)
 
 
+# Plot the multiSeasonalTS
+autoplot(multiSeasonalTS)
+
+# Set up the xreg matrix
+xreg <- fourier(multiSeasonalTS, K = c(10,0))
+
+# Fit a dynamic regression model
+fit <- auto.arima(multiSeasonalTS, xreg = xreg, seasonal = FALSE, stationary = TRUE)
+
+# Check the residuals
+checkresiduals(fit)
+
+# Plot forecasts for 10 working days ahead
+fc <- forecast(fit, xreg =  fourier(multiSeasonalTS, c(10, 0), h = 169*10))
+autoplot(fc)
+```
+
+### TBATS models
+TBATS model is a special kind of time series model. It can be very slow to estimate, especially with multiple seasonal time series
+```r
+# Plot the timeSeriesData
+autoplot(timeSeriesData)
+
+# Fit a TBATS model to the timeSeriesData
+fit <- tbats(timeSeriesData)
+
+# Forecast the series for the next 5 years
+fc <- forecast(fit, h=5*12)
+
+# Plot the forecasts
+autoplot(fc)
+```
