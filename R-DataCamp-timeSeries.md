@@ -65,22 +65,23 @@ legend(legendLocation, colnames(data))
 
 Common types of trends
 
-- persistent growth or decay over time
+- Linear: persistent growth or decay over time
   - removing trends in level by differencing
     - diff series: remove linear trend
-    - diff(x, s): seasonal difference transformation
+    - `diff(x, s)`: seasonal difference transformation
     - remove periodic trends
 
-- rapid growth/decay
+- Rapid growth/decay
+  - linearize using `log()`
 
-- increasing variability over time
-  * removing trend in variability using log transformation
+- Variance: increasing variability over time
+  - removing trend in variability using log transformation
     - log series: linearize linear trend
     - only use for +ve linear trend
     - It slightly shrinks observations that are greater than one towards zero, while greatly shrinking very large observations. This property can stabilize variability when a series exhibits increasing variability over time
 
-- periodic or seasonal patterns
-  * removing seasonal trends with seasonal differencing
+- Periodic or seasonal patterns
+  - removing seasonal trends with seasonal differencing
 
 ```r
 # removing trend in variability using log transformation
