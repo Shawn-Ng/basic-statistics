@@ -2,13 +2,24 @@
 
 Editor: Shawn Ng<br>
 Content Author: **Rob J. Hyndman**<br>
-Site: https://www.datacamp.com/courses/forecasting-using-r<br>
+[Site](https://www.datacamp.com/courses/forecasting-using-r)<br>
 
 1. [Exploring and visualizing time series in R](#1-exploring-and-visualizing-time-series-in-r)
 2. [Benchmark methods and forecast accuracy](#2-benchmark-methods-and-forecast-accuracy)
 3. [Exponential smoothing](#3-exponential-smoothing)
 4. [Forecasting with ARIMA models](#4-forecasting-with-arima-models)
+	- Forecasting with ARIMA models
+	- Comparing auto.arima() and ets() on non-seasonal data
+	- Automatic ARIMA models for seasonal time series
+	- Comparing auto.arima() and ets() on seasonal data
 5. [Advanced methods](#5-advanced-methods)
+	- Forecasting sales allowing for advertising expenditure
+	- Forecasting weekly data
+	- Harmonic regression for multiple seasonality
+	- TBATS models
+
+
+
 
 
 ## 1. Exploring and visualizing time series in R

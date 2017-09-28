@@ -2,24 +2,29 @@
 
 Editor: Shawn Ng<br>
 Content Author: **David S. Matteson**<br>
-Site: https://www.datacamp.com/courses/introduction-to-time-series-analysis<br>
+[Site](https://www.datacamp.com/courses/introduction-to-time-series-analysis)<br>
 
 1. [Exploratory time series data analysis](#1-exploratory-time-series-data-analysis)
+    - Sampling frequency
+    - Missing values
+    - Time series
 2. [Predicting the future](#2-predicting-the-future)
-    1. [Trend](#trend)
-    2. [White noise (WN) model](#white-noise-wn-model)
-    3. [Random walk (RW) model](#random-walk-rw-model)
-    4. [Stationary](#stationary)
+    - [Trend](#trend)
+    - [White noise (WN) model](#white-noise-wn-model)
+    - [Random walk (RW) model](#random-walk-rw-model)
+    - [Stationary](#stationary)
 3. [Correlation analysis and the autocorrelation function](#3-correlation-analysis-and-the-autocorrelation-function)
-    1. [Finanical time series](#financial-ts)
-    2. [Autocorrelation](#autocorrelation)
+    - [Finanical time series](#financial-ts)
+    - [Autocorrelation](#autocorrelation)
 4. [Autoregression (AR) model](#4-autoregression-ar-model)
 5. [Moving average (MA) model](#5-moving-average-ma-model)
-    1. [AR vs MA models](#ar-vs-ma-models)
+    - [AR vs MA models](#ar-vs-ma-models)
+
+
+
 
 
 ## 1. Exploratory time series data analysis
-
 ### Sampling frequency
 ```r
 > data
@@ -60,9 +65,7 @@ legend(legendLocation, colnames(data))
 
 
 ## 2. Predicting the future
-
 ### Trend
-
 Common types of trends
 
 - Linear: persistent growth or decay over time
@@ -101,7 +104,6 @@ length(data)
 length(dataE)
 ```
 
-
 ### White noise (WN) model
 1. Fixed, constant mean
 2. Fixed, constant variance
@@ -116,7 +118,6 @@ ts.plot(white_noise)
 # Estimate WN model
 arima(timeSeries, order=c(0,0,0))
 ```
-
 
 ### Random walk (RW) model
 1. No specified mean/variance
@@ -137,7 +138,6 @@ model_wn <- arima(diff(random_walk), order=c(0,0,0))
 # intercept
 model_wn$coef
 ```
-
 
 ### Stationary
 This means that the autocorrelation for any particular lag is the same regardless of where we are in time. Same mean, variance for all t. 
@@ -161,7 +161,6 @@ random_walk <- cumsum(white_noise)
 
 
 ## 3. Correlation analysis and the autocorrelation function
-
 ### Financial ts
 ```r
 # colMeans(): calculate the sample mean for each column
