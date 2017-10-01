@@ -7,6 +7,19 @@ Content Author: **Rob J. Hyndman**<br>
 1. [Exploring and visualizing time series in R](#1-exploring-and-visualizing-time-series-in-r)
 	- [Ljung-Box test](#ljung-box-test)
 2. [Benchmark methods and forecast accuracy](#2-benchmark-methods-and-forecast-accuracy)
+	- Forecast is the __mean/median__ of simulated futures of a time series
+	- [Naive forecast](#naive-forecast)
+	- [Time series residuals](#time-series-residuals)
+	- Forecast error: diff bet. observed value and its multi-steps forecast in the test set
+		- It is not residuals
+		- Errors on training vs test set
+	- Measures of forecast accuracy
+		1. Mean abs error (MAE)
+		2. Mean sq error (MSE)
+		3. Mean abs percentage error (MAPE)
+		4. Mean abs scaled error (MASE)
+	- [Evaluating forecast accuracy](#evaluating-forecast-accuracy)
+	- [Time series cross-validation: tsCV()](#time-series-cross-validation-tscv)
 3. [Exponential smoothing](#3-exponential-smoothing)
 4. [Forecasting with ARIMA models](#4-forecasting-with-arima-models)
 	- Forecasting with ARIMA models
@@ -45,7 +58,7 @@ data_subset <- window(ts_data, start=year)
 ggsubseriesplot(data_subset)
 ```
 
-When data are either seasonal or cyclic, the ACF will peak around the seasonal lags or at the average cycle length.
+When data are either seasonal/cyclic, the ACF will peak around the seasonal lags or at the average cycle length.
 
 ### Ljung-Box test
 ```r
@@ -66,65 +79,61 @@ Box.test(diff(ts_data), lag = 10, type = "Ljung")
 
 
 ## 2. Benchmark methods and forecast accuracy
-Forecast is the mean or median of simulated futures of a time series<br>
-Naive forecast: use the most recent observation
-
+### Naive forecast
+Uses the most recent observation
 ```r
-data_naive <- naive(data, h=20)
-data_seasonal_naive <- snaive(data, h = 16)
+data_naive <- naive(ts_data, h=20)
+data_seasonal_naive <- snaive(ts_data, h = 16)
 
-autoplot(data)
-summary(data)
+autoplot(ts_data)
+summary(ts_data)
 ```
 
+### Time series residuals
 Fitted value: 1-step forecast of all previous observations, not true forecast as all params are estimated<br>
 Residuals: 1-step forecast error, diff bet fitted value and obs
 
 ```r
 # p-value >= 0.05 -> white noise
-checkresiduals(naive(data))
-# same as, %>% pipe operator
-data %>% naive() %>% checkresiduals()
+checkresiduals(naive(ts_data))
 
-checkresiduals(snaive(data))
+# same as %>% pipe operator
+ts_data %>% naive() %>% checkresiduals()
+
+
+checkresiduals(snaive(ts_data))
 # same as
-data %>% snaive() %>% checkresiduals()
+ts_data %>% snaive() %>% checkresiduals()
 ```
 
-Forecast error: diff bet. observed value and its multi-steps forecast in the test set
-* It is not residuals
-* Errors on training vs test set
-
-Measures of forecast accuracy
-1. Mean abs error (MAE)
-2. Mean sq error (MSE)
-3. Mean abs percentage error (MAPE)
-4. Mean abs scaled error (MASE)
-
+### Evaluating forecast accuracy
 Training set: is a data set that is used to discover possible relationships<br>
 Test set: is a data set that is used to verify the strength of these potential relationships
 
-We are interested to see the forecast accuracy of test set
+We are interested to see the forecast accuracy of test set<br>
+__Root mean squared error (RMSE)__ which is the square root of the mean squared error (MSE). Smaller RMSE = better accuracy
 
 ```r
 ## Forecast accuracy of non-seasonal methods
 # assume data has 1108 data points
-training <- subset.ts(data, end=1000)
+train <- subset.ts(ts_data, end=1000)
 
 # naive forecast, simple forcasting functions, h=1108-1000
-naiveFC <- naive(training, h=108)
+naive_fc <- naive(train, h=108)
+
 # meanf(): gives forecasts equal to the mean of all observations
-meanFC <- meanf(training, h=108)
+mean_fc <- meanf(train, h=108)
 
 # smaller root mean squared error (RMSE) -> better accuracy
-accuracy(naiveFC, data)
-accuracy(meanFC, data)
+accuracy(naive_fc, ts_data)
+accuracy(mean_fc, ts_data)
+
 
 ## Forecast accuracyy of seasonal methods
 # Create three training series omitting the last 1, 2, and 3 years
-train1 <- window(vn[, "colZ"], end = c(2014, 4))
-train2 <- window(vn[, "colZ"], end = c(2013, 4))
-train3 <- window(vn[, "colZ"], end = c(2012, 4))
+train1 <- window(ts_data[, "COLUMN"], end = c(2014, 4))
+train2 <- window(ts_data[, "COLUMN"], end = c(2013, 4))
+train3 <- window(ts_data[, "COLUMN"], end = c(2012, 4))
 
 # Produce forecasts using snaive()
 fc1 <- snaive(train1, h = 4)
@@ -132,24 +141,28 @@ fc2 <- snaive(train2, h = 4)
 fc3 <- snaive(train3, h = 4)
 
 # Use accuracy() to compare the MAPE of each series
-accuracy(fc1, vn[, "colZ"])["Test set", "MAPE"]
-accuracy(fc2, vn[, "colZ"])["Test set", "MAPE"]
-accuracy(fc3, vn[, "colZ"])["Test set", "MAPE"]
+accuracy(fc1, ts_data[, "COLUMN"])["Test set", "MAPE"]
+accuracy(fc2, ts_data[, "COLUMN"])["Test set", "MAPE"]
+accuracy(fc3, ts_data[, "COLUMN"])["Test set", "MAPE"]
 ```
 
 Good forecasting model?
 * Small residuals only means that the model fits the training data well, not that it produces good forecasts.
 * A good model forecasts has low RMSE on the test set and has white noise residuals
 
+### Time series cross-validation: tsCV()
 ```r
-## time series cross-validation: tsCV()
 # Compute cross-validated errors for up to 8 steps ahead
 e <- matrix(NA_real_, nrow = 1000, ncol = 8)
+
 for (h in 1:8)
-  e[, h] <- tsCV(data, forecastfunction = naive, h = h)
+	e[, h] <- tsCV(ts_data, forecastfunction = naive, h = h)
 
 # Compute the MSE values and remove missing values
 mse <- colMeans(e^2, na.rm = TRUE)
+
+# Plot the MSE values against the forecast horizon
+data.frame(h = 1:8, MSE = mse) %>% ggplot(aes(x = h, y = MSE)) + geom_point()
 ```
 
 
