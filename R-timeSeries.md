@@ -19,6 +19,7 @@ Content Author: **David S. Matteson**<br>
 4. [Autoregression (AR) model](#4-autoregression-ar-model)
     - Autocorrelations can be estimated at many lags to better assess how a time series relates to its past
     - Each observation is regressed on the previous observation
+    - [Simple forecasts from an estimated AR model](#simple-forecasts-from-an-estimated-ar-model)
 5. [Moving average (MA) model](#5-moving-average-ma-model)
     - [AR vs MA models](#ar-vs-ma-models)
 
