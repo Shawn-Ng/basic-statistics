@@ -27,20 +27,20 @@ Content Author: **David S. Matteson**<br>
 ## 1. Exploratory time series data analysis
 ### Sampling frequency
 ```r
-start(TSData)
-end(TSData)
+start(ts_data)
+end(ts_data)
 
 # time creates the vector of times at which a time series was sampled
-time(TSData)
+time(ts_data)
 
 # deltat the time interval between observations
-deltat(TSData)
+deltat(ts_data)
 
 # frequency returns the number of samples per unit time
-frequency(TSData)
+frequency(ts_data)
 
 # cycle gives the positions in the cycle of each observation
-cycle(TSData)
+cycle(ts_data)
 ```
 
 ### Missing values
@@ -53,12 +53,8 @@ mean(data, na.rm=TRUE)
 ts(data, freq=TIME)
 is.ts()
 
-ts.plot(TSData, col)
-legend('topleft', legendLocation, colnames(TSData))
-
-
-ts.plot(log(TSData))
-ts.plot(diff(TSData))
+ts.plot(ts_data, col)
+legend('topleft', legendLocation, colnames(ts_data))
 ```
 
 
@@ -72,7 +68,7 @@ Common types of trends
 - Linear: persistent growth or decay over time
   - removing trends in level by differencing
     - diff series: remove linear trend
-    - `diff(x, s)`: seasonal difference transformation
+    - `diff(ts_data, s)`: seasonal difference transformation
     - remove periodic trends
 
 - Rapid growth/decay
@@ -81,28 +77,24 @@ Common types of trends
 - Variance: increasing variability over time
   - removing trend in variability using log transformation
     - log series: linearize linear trend
-    - only use for +ve linear trend
+    - Only use for +ve linear trend
     - It slightly shrinks observations that are greater than one towards zero, while greatly shrinking very large observations. This property can stabilize variability when a series exhibits increasing variability over time
 
 - Periodic or seasonal patterns
-  - removing seasonal trends with seasonal differencing
+  - `diff(ts_data, s)`: removing seasonal trends with seasonal differencing
 
 ```r
 # removing trend in variability using log transformation
-data <- log(data)
-ts.plot(data)
+data_log <- log(ts_data)
+ts.plot(data_log)
 
 # removing trends in level by differencing
-dataE <- diff(data)
-ts.plot(dataE)
-length(data)
-length(dataE)
+data_diff <- diff(ts_data)
+ts.plot(data_diff)
 
 # removing seasonal trends with seasonal differencing
-dataE <- diff(data, lag=4)
-ts.plot(dataE)
-length(data)
-length(dataE)
+data_seasonal <- diff(ts_data, lag=4)
+ts.plot(data_seasonal)
 ```
 
 ### White noise (WN) model
@@ -113,11 +105,11 @@ length(dataE)
 
 ```r
 # White model has arima(0,0,0) model, n=100 obs
-white_noise <- arima.sim(model = list(order=c(0,0,0)), n=100, mean=value, sd=value)
+white_noise <- arima.sim(model = list(order=c(0,0,0)), n=100, mean=VALUE, sd=VALUE)
 ts.plot(white_noise)
 
-# Estimate WN model
-arima(timeSeries, order=c(0,0,0))
+# Estimate the white noise model
+arima(ts_data, order=c(0,0,0))
 ```
 
 ### Random walk (RW) model
@@ -127,21 +119,28 @@ arima(timeSeries, order=c(0,0,0))
 
 ```r
 # RW has order=c(0,1,0)
-random_walk <- arima.sim(model = list(order=c(0,1,0)), n=100)
-ts.plot(random_walk)
+rw <- arima.sim(model = list(order=c(0,1,0)), n=100)
+ts.plot(rw)
+
+# Generate a RW model with a drift uing arima.sim
+rw_drift <- arima.sim(model = list(order = c(0, 1, 0)), n = 100, mean = 1)
 
 # 1st diff
-random_walk_diff <- diff(random_walk)
-ts.plot(random_walk_diff)
+rw_diff <- diff(rw)
+ts.plot(rw_diff)
 
 # fit WN to differenced RW data
-model_wn <- arima(diff(random_walk), order=c(0,0,0))
+model_wn <- arima(diff(rw), order=c(0,0,0))
+
 # intercept
-model_wn$coef
+int_wn <- model_wn$coef
+
+# Use abline(0, ...) to add time trend to the figure
+abline(0, int_wn)
 ```
 
 ### Stationary
-This means that the autocorrelation for any particular lag is the same regardless of where we are in time. Same mean, variance for all t. 
+This means that the autocorrelation for any particular lag is the same regardless of where we are in time. <u>Mean, variance, covariance constant for all t</u>.
 
 - Are parsimonious
 - Has distributional stability over time
@@ -150,11 +149,12 @@ This means that the autocorrelation for any particular lag is the same regardles
 
 - Fluctuate randomly
 - Behave similarly from 1 time period to the next
-- Can modeled with fewer params
+- Can modeled with <u>fewer params</u>
 
 ```r
-# Convert WN data to RW
+# Convert WN data to RW, vice-versa
 random_walk <- cumsum(white_noise)
+white_noise <- cumsum(random_walk)
 ```
 
 
