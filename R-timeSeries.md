@@ -18,6 +18,7 @@ Content Author: **David S. Matteson**<br>
     - [Autocorrelation](#autocorrelation)
 4. [Autoregression (AR) model](#4-autoregression-ar-model)
     - Autocorrelations can be estimated at many lags to better assess how a time series relates to its past
+    - Each observation is regressed on the previous observation
 5. [Moving average (MA) model](#5-moving-average-ma-model)
     - [AR vs MA models](#ar-vs-ma-models)
 
@@ -113,6 +114,8 @@ arima(ts_data, order=c(0,0,0))
 ```
 
 ### Random walk (RW) model
+RW model is not stationary and exhibits very strong persistence. Its sample autocovariance function (ACF) also decays to zero very slowly, meaning past values have a long lasting impact on current values.
+
 1. No specified mean/variance
 2. Strong dependence over time -> little covariance
 3. Its changes/increments are white noise
@@ -187,7 +190,7 @@ cov(ts_data); cor(ts_data)
 cor(ts_data)
 
 # lag-i autocorrelation
-acf(ts_data, lag.max=1, plot=TRUE)
+acf(ts_data, lag.max=10, plot=TRUE)
 ```
 
 
@@ -203,6 +206,8 @@ Mean centered version:
 
 - WN & RW model are special cases
 - RW model is a special case of AR modoel, where slope params = 1
+- Persistence is defined by a high correlation between an observation and its lag
+- Anti-persistence is defined by a large amount of variation between an observation and its lag
 - Strong persistence = very little convariance
 
 ```r
@@ -210,17 +215,42 @@ Mean centered version:
 x <- arima.sim(model=list(ar=0.5), n=100)
 
 # ACF estimate the autocorrelation function
-acf(data)
+acf(ts_data)
 
 # Fitting AR model
-AR <- arima(data, order=c(1,0,0))
-ts.plot(data)
+AR <- arima(ts_data, order=c(1,0,0))
+ts.plot(ts_data)
 AR_fitted <- AR - residuals(AR)
 points(AR_fitted)
 
 # Predict 1 to 10 steps ahead
-predict(data, n.ahead=10)
+predict(ts_data, n.ahead=10)
 ```
+
+### Simple forecasts from an estimated AR model
+```r
+# Fit an AR model to ts_data
+AR_fit <- arima(ts_data, order = c(1,0,0))
+print(AR_fit)
+
+# Use predict() to make a 1-step forecast
+predict_AR <- predict(AR_fit)
+
+# Obtain the 1-step forecast using $pred[1]
+predict_AR$pred[1]
+
+# Use predict to make 1-step through 10-step forecasts
+predict(AR_fit, n.ahead = 10)
+
+# Run to plot the ts_data series plus the forecast and 95% prediction intervals
+ts.plot(ts_data, xlim = c(1871, 1980))
+AR_forecast <- predict(AR_fit, n.ahead = 10)$pred
+AR_forecast_se <- predict(AR_fit, n.ahead = 10)$se
+points(AR_forecast, type = "l", col = 2)
+points(AR_forecast - 2*AR_forecast_se, type = "l", col = 2, lty = 2)
+points(AR_forecast + 2*AR_forecast_se, type = "l", col = 2, lty = 2)
+```
+
 
 
 
