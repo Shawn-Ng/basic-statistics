@@ -32,33 +32,37 @@ Content Author: **Rob J. Hyndman**<br>
 4. [Forecasting with ARIMA models](#4-forecasting-with-arima-models)
 	- [Box-Cox transformations](#box-cox-transformations): stabilize the variance
 	- [Non-seasonal differencing for stationarity](#non-seasonal-differencing-for-stationarity)
-		- Differencing is a way of making a time series stationary; this means that you remove any systematic patterns such as trend and seasonality from the data. 
-		- A white noise series is considered a special case of a stationary time series.
+		- Differencing is a way of making a time series stationary; this means that you remove any systematic patterns such as trend and seasonality from the data
+		- A white noise series is considered a special case of a stationary time series
 	- [Seasonal differencing for stationarity](#seasonal-differencing-for-stationarity)
-		- For example, with quarterly data, one would take the difference between Q1 in one year and Q1 in the previous year. This is called seasonal differencing.
+		- For example, with quarterly data, one would take the difference between Q1 in one year and Q1 in the previous year. This is called seasonal differencing
 		- Sometimes you need to apply both seasonal differences and lag-1 differences to the same series, thus, calculating the differences in the differences
 	- [Automatic ARIMA models for non-seasonal time series](#automatic-arima-models-for-non-seasonal-time-series)
 		- `auto.arima()` function will select an appropriate autoregressive integrated moving average (ARIMA) model given a time series
 	- [Forecasting with ARIMA models](#forecasting-with-arima-models)
-		- The `Arima()` function can be used to select a specific ARIMA model. 
-		- Its first argument, order, is set to a vector that specifies the values of `p`, `d` and `q`. 
+		- The `arima()` function can be used to select a specific ARIMA model
+		- Its first argument, order, is set to a vector that specifies the values of `p`, `d` and `q`
 		- The second argument, `include.constant`, is a booolean that determines if the constant cc, or drift, should be included
 	- [Comparing auto.arima() and ets() on non-seasonal data](#comparing-autoarima-and-ets-on-non-seasonal-data)
-		- The AICc statistic is useful for selecting between models in the same class. 
-		- For example, you can use it to select an ETS model or to select an ARIMA model. 
-		- However, you cannot use it to compare ETS and ARIMA models because they are in different model classes.
+		- The AICc statistic is useful for selecting between __models in the same class__
+		- For example, you can use it to select an ETS model or to select an ARIMA model 
+		- However, you cannot use it to compare ETS and ARIMA models because they are in different model classes
+		- Use __time series cross-validation__ to compare an ARIMA model and an ETS model
 	- [Automatic ARIMA models for seasonal time series](#automatic-arima-models-for-seasonal-time-series)
 		- Note that setting `lambda = 0` in the `auto.arima()` function - applying a log transformation - means that the model will be fitted to the transformed data, and that the forecasts will be back-transformed onto the original scale
 	- [Exploring auto.arima() options](#exploring-autoarima-options)
-		- The `auto.arima()` function needs to estimate a lot of different models, and various short-cuts are used to try to make the function as fast as possible. 
+		- The `auto.arima()` function needs to estimate a lot of different models, and various short-cuts are used to try to make the function as fast as possible
 		- This can cause a model to be returned which does not actually have the smallest AICc value. To make `auto.arima()` work harder to find a good model, add the optional argument `stepwise = FALSE` to look at a much larger collection of models
 	- [Comparing auto.arima() and ets() on seasonal data](#comparing-autoarima-and-ets-on-seasonal-data)
-		- If the series is very long, you can afford to use a training and test set rather than time series cross-validation. This is much faster.
+		- If the series is very long, you can afford to use a training and test set rather than time series cross-validation. This is much faster
 5. [Advanced methods](#5-advanced-methods)
-	- Forecasting sales allowing for advertising expenditure
-	- Forecasting weekly data
-	- Harmonic regression for multiple seasonality
-	- TBATS models
+	- [Forecasting sales allowing for advertising expenditure](#forecasting-sales-allowing-for-advertising-expenditure)
+	- [Forecasting weekly data](#forecasting-weekly-data)
+		- With weekly data, it is difficult to handle seasonality using ETS or ARIMA models as the seasonal length is too large (approximately 52). Instead, you can use harmonic regression which uses sines and cosines to model the seasonality
+	- [Harmonic regression for multiple seasonality](#harmonic-regression-for-multiple-seasonality)
+		- Harmonic regressions are also useful when time series have multiple seasonal patterns. `auto.arima()` would take a long time to fit a long time series. Instead you will fit a standard regression model with Fourier terms using the `tslm()` function
+	- [TBATS models](#tbats-models)
+		- TBATS model is a special kind of time series model. It can be very slow to estimate, especially with multiple seasonal time series
 
 
 
@@ -412,7 +416,6 @@ autoplot(fc) + xlab("Month") + ylab("Sales")
 ```
 
 ### Forecasting weekly data
-With weekly data, it is difficult to handle seasonality using ETS or ARIMA models as the seasonal length is too large (approximately 52). Instead, you can use harmonic regression which uses sines and cosines to model the seasonality.
 ```r
 # Set up harmonic regressors of order 13
 harmonics <- fourier(ts_data, K = 13)
@@ -429,7 +432,6 @@ autoplot(fc)
 ```
 
 ### Harmonic regression for multiple seasonality
-Harmonic regressions are also useful when time series have multiple seasonal patterns. `auto.arima()` would take a long time to fit a long time series. Instead you will fit a standard regression model with Fourier terms using the `tslm()` function
 ```r
 # Fit a harmonic regression using order 10 for each type of seasonality
 fit <- tslm(multiSeasonalTS ~ fourier(multiSeasonalTS, K = c(10, 10)))
@@ -462,7 +464,6 @@ autoplot(fc)
 ```
 
 ### TBATS models
-TBATS model is a special kind of time series model. It can be very slow to estimate, especially with multiple seasonal time series
 ```r
 # Plot the ts_data
 autoplot(ts_data)
