@@ -27,23 +27,20 @@ Content Author: **David S. Matteson**<br>
 ## 1. Exploratory time series data analysis
 ### Sampling frequency
 ```r
-> data
-     Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec
-1949 xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx
-1950 xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx
-1951 xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx
-1952 xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx
-1953 xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx
-1954 xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx
-1955 xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx
-1956 xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx
-1957 xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx
-1958 xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx
-1959 xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx
-1960 xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx xxx
+start(TSData)
+end(TSData)
 
-Relevant functions:
-start(), end(), time(), deltat(), frequency(), cycle()
+# time creates the vector of times at which a time series was sampled
+time(TSData)
+
+# deltat the time interval between observations
+deltat(TSData)
+
+# frequency returns the number of samples per unit time
+frequency(TSData)
+
+# cycle gives the positions in the cycle of each observation
+cycle(TSData)
 ```
 
 ### Missing values
@@ -53,11 +50,15 @@ mean(data, na.rm=TRUE)
 
 ### Time series
 ```r
-ts(data, freq=ytimeline)
+ts(data, freq=TIME)
 is.ts()
 
-ts.plot(data, col:)
-legend(legendLocation, colnames(data))
+ts.plot(TSData, col)
+legend('topleft', legendLocation, colnames(TSData))
+
+
+ts.plot(log(TSData))
+ts.plot(diff(TSData))
 ```
 
 
