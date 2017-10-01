@@ -17,6 +17,7 @@ Content Author: **David S. Matteson**<br>
     - [Finanical time series](#financial-ts)
     - [Autocorrelation](#autocorrelation)
 4. [Autoregression (AR) model](#4-autoregression-ar-model)
+    - Autocorrelations can be estimated at many lags to better assess how a time series relates to its past
 5. [Moving average (MA) model](#5-moving-average-ma-model)
     - [AR vs MA models](#ar-vs-ma-models)
 
@@ -66,22 +67,21 @@ legend('topleft', legendLocation, colnames(ts_data))
 Common types of trends
 
 - Linear: persistent growth or decay over time
-  - removing trends in level by differencing
-    - diff series: remove linear trend
-    - `diff(ts_data, s)`: seasonal difference transformation
-    - remove periodic trends
+    - removing trends in level by differencing
+        - `diff(ts_data, s)`: remove linear trend using seasonal difference transformation
+        - remove periodic trends
 
 - Rapid growth/decay
-  - linearize using `log()`
+    - linearize using `log()`
 
 - Variance: increasing variability over time
-  - removing trend in variability using log transformation
-    - log series: linearize linear trend
-    - Only use for +ve linear trend
-    - It slightly shrinks observations that are greater than one towards zero, while greatly shrinking very large observations. This property can stabilize variability when a series exhibits increasing variability over time
+    - removing trend in variability using log transformation
+        - log series: linearize linear trend
+        - Only use for +ve linear trend
+        - It slightly shrinks observations that are greater than one towards zero, while greatly shrinking very large observations. This property can stabilize variability when a series exhibits increasing variability over time
 
 - Periodic or seasonal patterns
-  - `diff(ts_data, s)`: removing seasonal trends with seasonal differencing
+    - `diff(ts_data, s)`: removing seasonal trends with seasonal differencing
 
 ```r
 # removing trend in variability using log transformation
@@ -140,16 +140,16 @@ abline(0, int_wn)
 ```
 
 ### Stationary
-This means that the autocorrelation for any particular lag is the same regardless of where we are in time. <u>Mean, variance, covariance constant for all t</u>.
+This means that the autocorrelation for any particular lag is the same regardless of where we are in time. __Mean, variance, covariance constant for all t__.
 
 - Are parsimonious
 - Has distributional stability over time
 
-**Observed time series**:
+__Observed time series__:
 
 - Fluctuate randomly
 - Behave similarly from 1 time period to the next
-- Can modeled with <u>fewer params</u>
+- Can modeled with __fewer params__
 
 ```r
 # Convert WN data to RW, vice-versa
@@ -165,16 +165,16 @@ white_noise <- cumsum(random_walk)
 ### Financial ts
 ```r
 # colMeans(): calculate the sample mean for each column
-colMeans()
+colMeans(ts_data)
 
 # calculate sample var/hist/qqnorm for each index
-apply(data, FUN=var/hist/qqnorm)
+apply(ts_data, FUN=var/hist/qqnorm)
 
-# to make a scatterplot matrix of the indices in data
-pairs(data)
+# to make a scatterplot matrix of the indices in ts_data
+pairs(ts_data)
 
 # sample covariances and correlations
-cov(); cor()
+cov(ts_data); cor(ts_data)
 ```
 
 - Correlation is standandized of covariance
@@ -184,10 +184,10 @@ cov(); cor()
 
 ### Autocorrelation
 ```r
-cor()
+cor(ts_data)
 
 # lag-i autocorrelation
-acf(data, lag.max)
+acf(ts_data, lag.max=1, plot=TRUE)
 ```
 
 
