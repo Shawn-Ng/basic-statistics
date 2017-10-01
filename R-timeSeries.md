@@ -5,9 +5,9 @@ Content Author: **David S. Matteson**<br>
 [Site](https://www.datacamp.com/courses/introduction-to-time-series-analysis)<br>
 
 1. [Exploratory time series data analysis](#1-exploratory-time-series-data-analysis)
-    - Sampling frequency
-    - Missing values
-    - Time series
+    - [Sampling frequency](#sampling-frequency)
+    - [Missing values](#missing-values)
+    - [Time series](#time-series)
 2. [Predicting the future](#2-predicting-the-future)
     - [Trend](#trend)
     - [White noise (WN) model](#white-noise-wn-model)
