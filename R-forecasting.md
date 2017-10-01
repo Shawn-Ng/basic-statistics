@@ -5,6 +5,7 @@ Content Author: **Rob J. Hyndman**<br>
 [Site](https://www.datacamp.com/courses/forecasting-using-r)<br>
 
 1. [Exploring and visualizing time series in R](#1-exploring-and-visualizing-time-series-in-r)
+	- [Ljung-Box test](#ljung-box-test)
 2. [Benchmark methods and forecast accuracy](#2-benchmark-methods-and-forecast-accuracy)
 3. [Exponential smoothing](#3-exponential-smoothing)
 4. [Forecasting with ARIMA models](#4-forecasting-with-arima-models)
@@ -24,29 +25,40 @@ Content Author: **Rob J. Hyndman**<br>
 
 ## 1. Exploring and visualizing time series in R
 ```r
-autoplot(data)
+library(forecast)
+library(ggplot2)
+library(fpp2)
+
+autoplot(ts_data)
 
 # To find outlier
-which.max(data)
+which.max(ts_data)
 
 # No. of obs per unit time
-frequency(data)
+frequency(ts_data)
 
-ggseasonplot(data)
-ggseasonplot(data, polar=T)
+ggseasonplot(ts_data)
+ggseasonplot(ts_data, polar=T)
 
 # Restrict the data to start in year
-dataE <- window(data, start=year)
-ggsubseriesplot(dataE)
+data_subset <- window(ts_data, start=year)
+ggsubseriesplot(data_subset)
+```
 
-# Autocorrelation of non-seasonal time series
-autoplot(data)
-gglagplot(data)
-ggAcf(data)
+When data are either seasonal or cyclic, the ACF will peak around the seasonal lags or at the average cycle length.
 
-# Ljung-Box test confirms the randomness of a series; 
-# p-value > 0.05 suggests that the data are not significantly different from white noise
-Box.test(diff(data), lag = 10, type = "Ljung")
+### Ljung-Box test
+```r
+autoplot(ts_data)
+
+# Plots a lag plot using ggplot
+gglagplot(ts_data)
+
+ggAcf(ts_data)
+
+# Ljung-Box test confirms the randomness of a series
+# p-value > 0.05 suggests that the ts_data are not significantly different from white noise
+Box.test(diff(ts_data), lag = 10, type = "Ljung")
 ```
 
 
