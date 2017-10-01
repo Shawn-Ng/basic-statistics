@@ -8,8 +8,10 @@ Content Author: **Rob J. Hyndman**<br>
 	- [Ljung-Box test](#ljung-box-test)
 2. [Benchmark methods and forecast accuracy](#2-benchmark-methods-and-forecast-accuracy)
 	- Forecast is the __mean/median__ of simulated futures of a time series
-	- [Naive forecast](#naive-forecast)
+	- [Naive forecast](#naive-forecast): Uses the most recent observation
 	- [Time series residuals](#time-series-residuals)
+		- Fitted value: 1-step forecast of all previous observations, not true forecast as all params are estimated
+		- Residuals: 1-step forecast error, diff bet fitted value and obs
 	- Forecast error: diff bet. observed value and its multi-steps forecast in the test set
 		- It is not residuals
 		- Errors on training vs test set
@@ -19,8 +21,14 @@ Content Author: **Rob J. Hyndman**<br>
 		3. Mean abs percentage error (MAPE)
 		4. Mean abs scaled error (MASE)
 	- [Evaluating forecast accuracy](#evaluating-forecast-accuracy)
+		- Training set: is a data set that is used to discover possible relationships
+		- Test set: is a data set that is used to verify the strength of these potential relationships
 	- [Time series cross-validation: tsCV()](#time-series-cross-validation-tscv)
 3. [Exponential smoothing](#3-exponential-smoothing)
+	- [SES VS NAIVE](#ses-vs-naive)
+	- [Holt's trend methods](#holts-trend-methods)
+	- [Fit errors, trend, and seasonality (ETS) model to data](#fit-errors-trend-and-seasonality-ets-model-to-data)
+	- [ETS VS seasonal naive](#ets-vs-seasonal-naive)
 4. [Forecasting with ARIMA models](#4-forecasting-with-arima-models)
 	- Forecasting with ARIMA models
 	- Comparing auto.arima() and ets() on non-seasonal data
@@ -80,7 +88,6 @@ Box.test(diff(ts_data), lag = 10, type = "Ljung")
 
 ## 2. Benchmark methods and forecast accuracy
 ### Naive forecast
-Uses the most recent observation
 ```r
 data_naive <- naive(ts_data, h=20)
 data_seasonal_naive <- snaive(ts_data, h = 16)
@@ -90,9 +97,6 @@ summary(ts_data)
 ```
 
 ### Time series residuals
-Fitted value: 1-step forecast of all previous observations, not true forecast as all params are estimated<br>
-Residuals: 1-step forecast error, diff bet fitted value and obs
-
 ```r
 # p-value >= 0.05 -> white noise
 checkresiduals(naive(ts_data))
@@ -107,9 +111,6 @@ ts_data %>% snaive() %>% checkresiduals()
 ```
 
 ### Evaluating forecast accuracy
-Training set: is a data set that is used to discover possible relationships<br>
-Test set: is a data set that is used to verify the strength of these potential relationships
-
 We are interested to see the forecast accuracy of test set<br>
 __Root mean squared error (RMSE)__ which is the square root of the mean squared error (MSE). Smaller RMSE = better accuracy
 
@@ -173,67 +174,59 @@ data.frame(h = 1:8, MSE = mse) %>% ggplot(aes(x = h, y = MSE)) + geom_point()
 ```r
 # ses(): simple exponential smoothing. The parameters are estimated using least squares estimation.
 # h: horizon, years
-fc <- ses(timeSeriesData, h=10)
+fc <- ses(ts_data, h=10)
 
 # smoothing parameters, alpha=0.3457 -> 34.57% of emphasis on latest data
 summary(fc)
 
 # Add 1 step forecast for training data
 autoplot(fc) + autolayer(fitted(fc))
+```
 
+### SES VS NAIVE
+```r
+train <- subset.ts(ts_data, end=length(ts_data)-length(test))
 
-# SES VS NAIVE
-# x is the number of obs reserved for testing
-train <- subset.ts(timeSeriesData, end=length(timeSeriesData)-x)
+fcSes <- naive(train, h=PERIOD)
+fcNaive <- ses(train, h=PERIOD)
+accuracy(fcSes, ts_data)
+accuracy(fcNaive, ts_data)
+```
 
-fcSes <- naive(train, h=x)
-fcNaive <- ses(train, h=x)
-accuracy(fcSes, timeSeriesData)
-accuracy(fcNaive, timeSeriesData)
-
-
-# Holt's trend methods
-fcholt <- holt(timeSeriesData, h=x)
+### Holt's trend methods
+```r
+fcholt <- holt(ts_data, h=PERIOD)
 summary(fcholt)
 autoplot(fcholt)
 checkresiduals(fcholt)
 
 # Holt with monthly data
-# 1 year -> h=1*12
-fc <- holt(timeSeriesData, seasonal="multiplicative", h=12)
+fc <- holt(ts_data, seasonal="multiplicative", h=12)
+```
 
-
-# Fit ETS model to data
-fitdata <- ets(timeSeriesData)
+### Fit errors, trend, and seasonality (ETS) model to data
+```r
+fitdata <- ets(ts_data)
 checkresiduals(fitdata)
+
 # p value > 0.05 => model fails the Ljung-Box test
 autoplot(forecast(fitdata))
+```
 
-
-# ETS VS seasonal naive
+### ETS VS seasonal naive
+```r
 # Function to return ETS forecasts
 fets <- function(y, h) {
   forecast(ets(y), h = h)
 }
 
 # Apply tsCV() for both methods
-e1 <- tsCV(timeSeriesData, fets, h = 4)
-e2 <- tsCV(timeSeriesData, snaive, h = 4)
+e1 <- tsCV(ts_data, fets, h = 4)
+e2 <- tsCV(ts_data, snaive, h = 4)
 
 # Compute MSE of resulting errors
 mean(e1^2, na.rm=TRUE)
 mean(e2^2, na.rm=TRUE)
-
-
-# ETS doesn't always work
-# Use ets() to model the lynx series
-fit <- ets(timeSeriesData)
-
-# Use summary() to look at model and parameters
-summary(fit)
-
-# Plot 20-year forecasts of the series
-fit %>% forecast(h=20) %>% autoplot()
 ```
 
 
@@ -244,26 +237,26 @@ fit %>% forecast(h=20) %>% autoplot()
 ```r
 # 1. Box-Cox transformations
 # Try four values of lambda in Box-Cox transformations
-timeSeriesData %>% BoxCox(lambda = 0.0) %>% autoplot()
-timeSeriesData %>% BoxCox(lambda = 0.1) %>% autoplot()
-timeSeriesData %>% BoxCox(lambda = 0.2) %>% autoplot()
-timeSeriesData %>% BoxCox(lambda = 0.3) %>% autoplot()
+ts_data %>% BoxCox(lambda = 0.0) %>% autoplot()
+ts_data %>% BoxCox(lambda = 0.1) %>% autoplot()
+ts_data %>% BoxCox(lambda = 0.2) %>% autoplot()
+ts_data %>% BoxCox(lambda = 0.3) %>% autoplot()
 
 # Compare with BoxCox.lambda()
-BoxCox.lambda(timeSeriesData)
+BoxCox.lambda(ts_data)
 ```
 
 Differencing is a way of making a time series stationary; this means that you remove any systematic patterns such as trend and seasonality from the data. A white noise series is considered a special case of a stationary time series.
 ```r
 # 2. Non-seasonal differencing for stationarity
 # Plot the rate
-autoplot(timeSeriesData)
+autoplot(ts_data)
 
 # Plot the differenced rate
-autoplot(diff(timeSeriesData))
+autoplot(diff(ts_data))
 
 # Plot the ACF of the differenced rate
-ggAcf(diff(timeSeriesData))
+ggAcf(diff(ts_data))
 ```
 
 With seasonal data, differences are often taken between observations in the same season of consecutive years, rather than in consecutive periods. For example, with quarterly data, one would take the difference between Q1 in one year and Q1 in the previous year. This is called seasonal differencing.
@@ -271,10 +264,10 @@ With seasonal data, differences are often taken between observations in the same
 Sometimes you need to apply both seasonal differences and lag-1 differences to the same series, thus, calculating the differences in the differences
 ```r
 # Plot the data
-autoplot(timeSeriesData)
+autoplot(ts_data)
 
-# Take logs and seasonal differences of timeSeriesData
-difflogData <- diff(log(timeSeriesData), lag = 12)
+# Take logs and seasonal differences of ts_data
+difflogData <- diff(log(ts_data), lag = 12)
 
 # Plot difflogData
 autoplot(difflogData)
@@ -289,8 +282,8 @@ ggAcf(ddifflogData)
 
 `auto.arima()` function will select an appropriate autoregressive integrated moving average (ARIMA) model given a time series
 ```r
-# Fit an automatic ARIMA model to the timeSeriesData series
-fit <- auto.arima(timeSeriesData)
+# Fit an automatic ARIMA model to the ts_data series
+fit <- auto.arima(ts_data)
 
 # Check that the residuals look like white noise
 checkresiduals(fit)
@@ -304,16 +297,16 @@ fit %>% forecast(h = 10) %>% autoplot()
 The `Arima()` function can be used to select a specific ARIMA model. Its first argument, order, is set to a vector that specifies the values of `p`, `d` and `q`. The second argument, `include.constant`, is a booolean that determines if the constant cc, or drift, should be included
 ```r
 # Plot forecasts from an ARIMA(0,1,1) model with no drift
-timeSeriesData %>% Arima(order = c(0,1,1), include.constant = FALSE) %>% forecast() %>% autoplot()
+ts_data %>% Arima(order = c(0,1,1), include.constant = FALSE) %>% forecast() %>% autoplot()
 
 # Plot forecasts from an ARIMA(2,1,3) model with drift
-timeSeriesData %>% Arima(order = c(2,1,3), include.constant = TRUE) %>% forecast() %>% autoplot()
+ts_data %>% Arima(order = c(2,1,3), include.constant = TRUE) %>% forecast() %>% autoplot()
 
 # Plot forecasts from an ARIMA(0,0,1) model with a constant
-timeSeriesData %>% Arima(order = c(0,0,1), include.constant = TRUE) %>% forecast() %>% autoplot()
+ts_data %>% Arima(order = c(0,0,1), include.constant = TRUE) %>% forecast() %>% autoplot()
 
 # Plot forecasts from an ARIMA(0,2,1) model with no constant
-timeSeriesData %>% Arima(order = c(0,2,1), include.constant = FALSE) %>% forecast() %>% autoplot()
+ts_data %>% Arima(order = c(0,2,1), include.constant = FALSE) %>% forecast() %>% autoplot()
 ```
 
 ### Comparing auto.arima() and ets() on non-seasonal data
@@ -328,25 +321,25 @@ farima <- function(x, h) {
 }
 
 # Compute CV errors for ETS as e1
-e1 <- tsCV(timeSeriesData, fets, 1)
+e1 <- tsCV(ts_data, fets, 1)
 
 # Compute CV errors for ARIMA as e2
-e2 <- tsCV(timeSeriesData, farima, 1)
+e2 <- tsCV(ts_data, farima, 1)
 
 # Find MSE of each model class
 mean(e1^2, na.rm=TRUE)
 mean(e2^2, na.rm=TRUE)
 
 # Plot 10-year forecasts using the best model class
-timeSeriesData %>% farima(h=10) %>% autoplot()
+ts_data %>% farima(h=10) %>% autoplot()
 ```
 
 ### Automatic ARIMA models for seasonal time series
 `auto.arima()` function also works with seasonal data. Note that setting `lambda = 0` in the `auto.arima()` function - applying a log transformation - means that the model will be fitted to the transformed data, and that the forecasts will be back-transformed onto the original scale
 ```r
-# Check that the logged timeSeriesData have stable variance
-timeSeriesData %>% log() %>% autoplot()
-fit <- auto.arima(timeSeriesData, lambda=0)
+# Check that the logged ts_data have stable variance
+ts_data %>% log() %>% autoplot()
+fit <- auto.arima(ts_data, lambda=0)
 summary(fit)
 # Plot 2-year forecasts
 fit %>% forecast(h=24) %>% autoplot()
@@ -354,14 +347,14 @@ fit %>% forecast(h=24) %>% autoplot()
 
 The `auto.arima()` function needs to estimate a lot of different models, and various short-cuts are used to try to make the function as fast as possible. This can cause a model to be returned which does not actually have the smallest AICc value. To make `auto.arima()` work harder to find a good model, add the optional argument `stepwise = FALSE` to look at a much larger collection of models
 ```r
-auto.arima(timeSeriesData, stepwise = FALSE)
+auto.arima(ts_data, stepwise = FALSE)
 ```
 
 ### Comparing auto.arima() and ets() on seasonal data
 Because the series is very long, you can afford to use a training and test set rather than time series cross-validation. This is much faster.
 ```r
-# Use 20 years of the timeSeriesData beginning in 1988
-train <- window(timeSeriesData, start = c(1988,1), end = c(2007,4))
+# Use 20 years of the ts_data beginning in 1988
+train <- window(ts_data, start = c(1988,1), end = c(2007,4))
 
 # Fit an ARIMA and an ETS model to the training data
 fit1 <- auto.arima(train)
@@ -376,8 +369,8 @@ fc1 <- forecast(fit1, h = 25)
 fc2 <- forecast(fit2, h = 25)
 
 # Use accuracy() to find better model based on RMSE
-accuracy(fc1, timeSeriesData)
-accuracy(fc2, timeSeriesData)
+accuracy(fc1, ts_data)
+accuracy(fc2, ts_data)
 ```
 
 
@@ -407,13 +400,13 @@ autoplot(fc) + xlab("Month") + ylab("Sales")
 With weekly data, it is difficult to handle seasonality using ETS or ARIMA models as the seasonal length is too large (approximately 52). Instead, you can use harmonic regression which uses sines and cosines to model the seasonality.
 ```r
 # Set up harmonic regressors of order 13
-harmonics <- fourier(timeSeriesData, K = 13)
+harmonics <- fourier(ts_data, K = 13)
 
 # Fit regression model with ARIMA errors
-fit <- auto.arima(timeSeriesData, xreg = harmonics, seasonal = FALSE)
+fit <- auto.arima(ts_data, xreg = harmonics, seasonal = FALSE)
 
 # Forecasts next 3 years
-newharmonics <- fourier(timeSeriesData, K = 13, h = 3*52)
+newharmonics <- fourier(ts_data, K = 13, h = 3*52)
 fc <- forecast(fit, xreg = newharmonics)
 
 # Plot forecasts fc
@@ -456,11 +449,11 @@ autoplot(fc)
 ### TBATS models
 TBATS model is a special kind of time series model. It can be very slow to estimate, especially with multiple seasonal time series
 ```r
-# Plot the timeSeriesData
-autoplot(timeSeriesData)
+# Plot the ts_data
+autoplot(ts_data)
 
-# Fit a TBATS model to the timeSeriesData
-fit <- tbats(timeSeriesData)
+# Fit a TBATS model to the ts_data
+fit <- tbats(ts_data)
 
 # Forecast the series for the next 5 years
 fc <- forecast(fit, h=5*12)
