@@ -30,10 +30,30 @@ Content Author: **Rob J. Hyndman**<br>
 	- [Fit errors, trend, and seasonality (ETS) model to data](#fit-errors-trend-and-seasonality-ets-model-to-data)
 	- [ETS VS seasonal naive](#ets-vs-seasonal-naive)
 4. [Forecasting with ARIMA models](#4-forecasting-with-arima-models)
-	- Forecasting with ARIMA models
-	- Comparing auto.arima() and ets() on non-seasonal data
-	- Automatic ARIMA models for seasonal time series
-	- Comparing auto.arima() and ets() on seasonal data
+	- [Box-Cox transformations](#box-cox-transformations): stabilize the variance
+	- [Non-seasonal differencing for stationarity](#non-seasonal-differencing-for-stationarity)
+		- Differencing is a way of making a time series stationary; this means that you remove any systematic patterns such as trend and seasonality from the data. 
+		- A white noise series is considered a special case of a stationary time series.
+	- [Seasonal differencing for stationarity](#seasonal-differencing-for-stationarity)
+		- For example, with quarterly data, one would take the difference between Q1 in one year and Q1 in the previous year. This is called seasonal differencing.
+		- Sometimes you need to apply both seasonal differences and lag-1 differences to the same series, thus, calculating the differences in the differences
+	- [Automatic ARIMA models for non-seasonal time series](#automatic-arima-models-for-non-seasonal-time-series)
+		- `auto.arima()` function will select an appropriate autoregressive integrated moving average (ARIMA) model given a time series
+	- [Forecasting with ARIMA models](#forecasting-with-arima-models)
+		- The `Arima()` function can be used to select a specific ARIMA model. 
+		- Its first argument, order, is set to a vector that specifies the values of `p`, `d` and `q`. 
+		- The second argument, `include.constant`, is a booolean that determines if the constant cc, or drift, should be included
+	- [Comparing auto.arima() and ets() on non-seasonal data](#comparing-autoarima-and-ets-on-non-seasonal-data)
+		- The AICc statistic is useful for selecting between models in the same class. 
+		- For example, you can use it to select an ETS model or to select an ARIMA model. 
+		- However, you cannot use it to compare ETS and ARIMA models because they are in different model classes.
+	- [Automatic ARIMA models for seasonal time series](#automatic-arima-models-for-seasonal-time-series)
+		- Note that setting `lambda = 0` in the `auto.arima()` function - applying a log transformation - means that the model will be fitted to the transformed data, and that the forecasts will be back-transformed onto the original scale
+	- [Exploring auto.arima() options](#exploring-autoarima-options)
+		- The `auto.arima()` function needs to estimate a lot of different models, and various short-cuts are used to try to make the function as fast as possible. 
+		- This can cause a model to be returned which does not actually have the smallest AICc value. To make `auto.arima()` work harder to find a good model, add the optional argument `stepwise = FALSE` to look at a much larger collection of models
+	- [Comparing auto.arima() and ets() on seasonal data](#comparing-autoarima-and-ets-on-seasonal-data)
+		- If the series is very long, you can afford to use a training and test set rather than time series cross-validation. This is much faster.
 5. [Advanced methods](#5-advanced-methods)
 	- Forecasting sales allowing for advertising expenditure
 	- Forecasting weekly data
@@ -234,8 +254,8 @@ mean(e2^2, na.rm=TRUE)
 
 
 ## 4. Forecasting with ARIMA models
+### Box-Cox transformations
 ```r
-# 1. Box-Cox transformations
 # Try four values of lambda in Box-Cox transformations
 ts_data %>% BoxCox(lambda = 0.0) %>% autoplot()
 ts_data %>% BoxCox(lambda = 0.1) %>% autoplot()
@@ -246,9 +266,8 @@ ts_data %>% BoxCox(lambda = 0.3) %>% autoplot()
 BoxCox.lambda(ts_data)
 ```
 
-Differencing is a way of making a time series stationary; this means that you remove any systematic patterns such as trend and seasonality from the data. A white noise series is considered a special case of a stationary time series.
+### Non-seasonal differencing for stationarity
 ```r
-# 2. Non-seasonal differencing for stationarity
 # Plot the rate
 autoplot(ts_data)
 
@@ -259,9 +278,7 @@ autoplot(diff(ts_data))
 ggAcf(diff(ts_data))
 ```
 
-With seasonal data, differences are often taken between observations in the same season of consecutive years, rather than in consecutive periods. For example, with quarterly data, one would take the difference between Q1 in one year and Q1 in the previous year. This is called seasonal differencing.
-
-Sometimes you need to apply both seasonal differences and lag-1 differences to the same series, thus, calculating the differences in the differences
+### Seasonal differencing for stationarity
 ```r
 # Plot the data
 autoplot(ts_data)
@@ -280,7 +297,7 @@ autoplot(ddifflogData)
 ggAcf(ddifflogData)
 ```
 
-`auto.arima()` function will select an appropriate autoregressive integrated moving average (ARIMA) model given a time series
+### Automatic ARIMA models for non-seasonal time series
 ```r
 # Fit an automatic ARIMA model to the ts_data series
 fit <- auto.arima(ts_data)
@@ -294,7 +311,6 @@ fit %>% forecast(h = 10) %>% autoplot()
 ```
 
 ### Forecasting with ARIMA models
-The `Arima()` function can be used to select a specific ARIMA model. Its first argument, order, is set to a vector that specifies the values of `p`, `d` and `q`. The second argument, `include.constant`, is a booolean that determines if the constant cc, or drift, should be included
 ```r
 # Plot forecasts from an ARIMA(0,1,1) model with no drift
 ts_data %>% Arima(order = c(0,1,1), include.constant = FALSE) %>% forecast() %>% autoplot()
@@ -310,7 +326,6 @@ ts_data %>% Arima(order = c(0,2,1), include.constant = FALSE) %>% forecast() %>%
 ```
 
 ### Comparing auto.arima() and ets() on non-seasonal data
-The AICc statistic is useful for selecting between models in the same class. For example, you can use it to select an ETS model or to select an ARIMA model. However, you cannot use it to compare ETS and ARIMA models because they are in different model classes.
 ```r
 # Set up forecast functions for ETS and ARIMA models
 fets <- function(x, h) {
@@ -335,23 +350,23 @@ ts_data %>% farima(h=10) %>% autoplot()
 ```
 
 ### Automatic ARIMA models for seasonal time series
-`auto.arima()` function also works with seasonal data. Note that setting `lambda = 0` in the `auto.arima()` function - applying a log transformation - means that the model will be fitted to the transformed data, and that the forecasts will be back-transformed onto the original scale
 ```r
 # Check that the logged ts_data have stable variance
 ts_data %>% log() %>% autoplot()
+
 fit <- auto.arima(ts_data, lambda=0)
 summary(fit)
+
 # Plot 2-year forecasts
 fit %>% forecast(h=24) %>% autoplot()
 ```
 
-The `auto.arima()` function needs to estimate a lot of different models, and various short-cuts are used to try to make the function as fast as possible. This can cause a model to be returned which does not actually have the smallest AICc value. To make `auto.arima()` work harder to find a good model, add the optional argument `stepwise = FALSE` to look at a much larger collection of models
+### Exploring auto.arima() options
 ```r
 auto.arima(ts_data, stepwise = FALSE)
 ```
 
 ### Comparing auto.arima() and ets() on seasonal data
-Because the series is very long, you can afford to use a training and test set rather than time series cross-validation. This is much faster.
 ```r
 # Use 20 years of the ts_data beginning in 1988
 train <- window(ts_data, start = c(1988,1), end = c(2007,4))
