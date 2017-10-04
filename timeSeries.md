@@ -1,53 +1,57 @@
 # Time Series Cheatsheet
 
 1. Time series Graphics
-    1. Time plots
-    2. [Time series patterns](#time-series-patterns)
-    3. Seasonal plots
+    - Time plots
+    - [Time series patterns](#time-series-patterns)
+        1. Trend: Long-term increase or decrease in the data. It does not have to be linear
+        2. Level: The level of a series refers to its height on the ordinate axis. A series with a trend will have a changing level, but a series whose level changes may not have a trend
+        3. Seasonal: Always of a fixed and known period (quarters of the year, the month, day of the week, or time of day)
+        4. Cyclic: Exists when there are rises and falls that are not of a fixed period, average length of cycles is longer than the length of a seasonal pattern
+    - Seasonal plots
         - Makes it easier to spot seasonal patterns than normal TS plot
         - `seasonplot(ts_data)`
-    4. Seasonal subseries plots
+    - Seasonal subseries plots
         - Emphasises the pattherns within each season. Useful for identifying changes within particular seasons
         - `monthplot(ts_data)`
-    5. lag plots
+    - Lag plots
         - Checks whether a TS dataset is random
         - `lag.plot(ts_data, lags=INTEGER, layout=c(), diag=BOOLEAN)`
 2. Fundamental Time Series Model
-    1. [White Noise](#white-noise)
+    - [White Noise](#white-noise)
         1. mean function
         2. autocovariance function
-    2. Random Walk
+    - Random Walk
         - current step = drift + previous step + white noise
         - `y_t = c + y_(t-1) + e_t`
         - constant mean but not variance
-    3. ACFs
+    - ACFs
         - `acf(ts_data)`
         - Slow decrease in ACF as lags increase -> trend
         - Regular spikes -> seasonality
 3. [Benchmark Forecasting methods](#benchmark-forecasting-methods)
-    1. Average method
+    - Average method
         - Forecasts of all future values are equal to the mean of the historical data
         - `meanf(ts_data, h=VALUE)`
-    2. Naive method
+    - Naive method
         - Forecasts of all future values are equal to the most recent observation
         - `naive(ts_data, h=VALUE)`
         - `rwf(ts_data, h=VALUE, drift=T)`
         - rwf: random walk with drift
         - Naive method is potimal when data comes from random walk
-    3. Seasonal Naive Forecast
+    - Seasonal Naive Forecast
         - Forecast to be equal to the last observed value from the same season of the previous year
         - `snaive(ts_data, h=VALUE)`
 4. Adjustments and Transformations
-    1. Calendar
+    - Calendar
         - Some of the the troughs are cause by different number of days in a month
         - To change from accumulated monthly production to daily production
         - `plot(ts_data/monthdays(ts_data))`
-    2. Population
+    - Population
         - It is better to track number of units per 1000 people than total number of units
-    3. Inflation
+    - Inflation
         - Data affected by value of money are best adjusted before modeling
         - price index = `item price in year x / item price in year x+1 * 100`
-    4. Transformations
+    - Transformations
         1. Logarithms: Changes in a log value are relative (percent) changes on the original scale
         2. Box-Cox: Stabilising variance
             - `data_tf <- BoxCox(ts_data, lambda=BoxCox.lambda(ts_data))`
@@ -60,7 +64,7 @@
     - Residual also known as training error
     - Residual values: `data_fc$residuals`
     - Fitted values: `data_fc$fitted`
-    1. Residual Properties
+    - Residual Properties
         1. Essential
             - Uncorrelated
             - 0 mean
@@ -71,7 +75,7 @@
     - Residual correlated -> ARIMA
     - Residual with non 0 mean -> add mean to all forecast
     - `checkresiduals(naive(data_fc),test=FALSE)`
-    2. Portmanteau Tests
+    - Portmanteau Tests
         - Test of whether the first h autocorrelations, are significantly different from what would be expected from a white noise process
         - `res <- residuals(naive(data))`
         1. Box-Pierce test
@@ -80,12 +84,12 @@
             - p-value < 0.05 -> not white noise
             - `Box.test(res, lag=10, fitdf=0, type="Lj")`
 6. Evaluating Forecast Accuracy
-    1. Training and Test Sets
+    - Training and Test Sets
         - Training data: Estimate the params of a model
         - Test data: Evaluate model's accuracy
         - Good fit to training data != model forecast well
         - Enough params -> perfect fit, but don't overfit
-    2. [Error Metrics](#error-metrics)
+    - [Error Metrics](#error-metrics)
         - Forecast error: diff(obs value - forecast)
         - Scale dependent error
             1. Mean Absolute Error (MAE), low MAE -> optimal forecast of median
@@ -100,7 +104,7 @@
             3. Scaled Error
                 - better than naive forecast -> <1
                 - worse than naive forecast -> >1
-    3. [Time Series Cross Validation](#time-series-cross-validation)
+    - [Time Series Cross Validation](#time-series-cross-validation)
         - More sophiscated version of training/test
 7. Prediction Intervals
     - 1 step ahead forecast -> forecast dis sd = residuals sd
