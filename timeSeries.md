@@ -27,21 +27,21 @@
 3. [Benchmark Forecasting methods](#benchmark-forecasting-methods)
     1. Average method
         - Forecasts of all future values are equal to the mean of the historical data
-        - `meanf(ts_data, horizon)`
+        - `meanf(ts_data, h=VALUE)`
     2. Naive method
         - Forecasts of all future values are equal to the most recent observation
-        - `naive(ts_data, horizon)`
-        - `rwf(ts_data, horizon, drift=T)`
+        - `naive(ts_data, h=VALUE)`
+        - `rwf(ts_data, h=VALUE, drift=T)`
         - rwf: random walk with drift
         - Naive method is potimal when data comes from random walk
     3. Seasonal Naive Forecast
         - Forecast to be equal to the last observed value from the same season of the previous year
-        - `snaive(ts_data, horizon)`
+        - `snaive(ts_data, h=VALUE)`
 4. Adjustments and Transformations
     1. Calendar
         - Some of the the troughs are cause by different number of days in a month
         - To change from accumulated monthly production to daily production
-        - `plot(data/monthdays(data))`
+        - `plot(ts_data/monthdays(ts_data))`
     2. Population
         - It is better to track number of units per 1000 people than total number of units
     3. Inflation
@@ -106,7 +106,7 @@
     - 1 step ahead forecast -> forecast dis sd = residuals sd
     - No parameter estimated -> 2 sd identical
     - Parameter estimated -> forecast dis sd > residuals sd
-    - Forecast horizon increase -> Prediction interval increase
+    - Forecast h increase -> Prediction interval increase
 
 
 
@@ -115,10 +115,10 @@
 ### Time series patterns
 ```r
 # frequency=1,4,12,52 are annual, quarterly, monthly, weekly respectively
-ts_data <- ts(data, start=YEAR, frequency=12)
+ts_data <- ts(data, start=c(YEAR, QUARTER), frequency=12)
 
 # window(): extract subset of time series
-subset <- window(data, start=YEAR, end=YEAR)
+subset <- window(data, start=c(YEAR, QUARTER), end=c(YEAR, QUARTER))
 
 # time series plot
 plot(ts_data)
