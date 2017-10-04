@@ -5,13 +5,13 @@
     2. [Time series patterns](#time-series-patterns)
     3. Seasonal plots
         - Makes it easier to spot seasonal patterns than normal TS plot
-        - `seasonplot(timeSeriesData)`
+        - `seasonplot(ts_data)`
     4. Seasonal subseries plots
         - Emphasises the pattherns within each season. Useful for identifying changes within particular seasons
-        - `monthplot(timeSeriesData)`
+        - `monthplot(ts_data)`
     5. lag plots
         - Checks whether a TS dataset is random
-        - `lag.plot(timeSeriesData, lags=INTEGER, layout=c(), diag=BOOLEAN)`
+        - `lag.plot(ts_data, lags=INTEGER, layout=c(), diag=BOOLEAN)`
 2. Fundamental Time Series Model
     1. [White Noise](#white-noise)
         1. mean function
@@ -21,22 +21,22 @@
         - `y_t = c + y_(t-1) + e_t`
         - constant mean but not variance
     3. ACFs
-        - `acf(timeSeriesData)`
+        - `acf(ts_data)`
         - Slow decrease in ACF as lags increase -> trend
         - Regular spikes -> seasonality
 3. [Benchmark Forecasting methods](#benchmark-forecasting-methods)
     1. Average method
         - Forecasts of all future values are equal to the mean of the historical data
-        - `meanf(timeSeriesData, horizon)`
+        - `meanf(ts_data, horizon)`
     2. Naive method
         - Forecasts of all future values are equal to the most recent observation
-        - `naive(timeSeriesData, horizon)`
-        - `rwf(timeSeriesData, horizon, drift=T)`
+        - `naive(ts_data, horizon)`
+        - `rwf(ts_data, horizon, drift=T)`
         - rwf: random walk with drift
         - Naive method is potimal when data comes from random walk
     3. Seasonal Naive Forecast
         - Forecast to be equal to the last observed value from the same season of the previous year
-        - `snaive(timeSeriesData, horizon)`
+        - `snaive(ts_data, horizon)`
 4. Adjustments and Transformations
     1. Calendar
         - Some of the the troughs are cause by different number of days in a month
@@ -50,16 +50,16 @@
     4. Transformations
         1. Logarithms: Changes in a log value are relative (percent) changes on the original scale
         2. Box-Cox: Stabilising variance
-            - `tData <- BoxCox(timeSeriesData, lambda=BoxCox.lambda(timeSeriesData))`
-            - `plot(tData)`
+            - `data_tf <- BoxCox(ts_data, lambda=BoxCox.lambda(ts_data))`
+            - `plot(data_tf)`
         3. Back-transforming Forecasts
         4. [Bias Adjustments](#bias-adjustments)
 5. Residual Diagnostics
     - Obs value - forecast/fitted value
     - 1 step ahead forecast
     - Residual also known as training error
-    - Residual values: `forecastData$residuals`
-    - Fitted values: `forecastData$fitted`
+    - Residual values: `data_fc$residuals`
+    - Fitted values: `data_fc$fitted`
     1. Residual Properties
         1. Essential
             - Uncorrelated
@@ -70,7 +70,7 @@
     - Properties not met -> forecast method can be improved
     - Residual correlated -> ARIMA
     - Residual with non 0 mean -> add mean to all forecast
-    - `checkresiduals(naive(forecastData),test=FALSE)`
+    - `checkresiduals(naive(data_fc),test=FALSE)`
     2. Portmanteau Tests
         - Test of whether the first h autocorrelations, are significantly different from what would be expected from a white noise process
         - `res <- residuals(naive(data))`
@@ -115,16 +115,16 @@
 ### Time series patterns
 ```r
 # frequency=1,4,12,52 are annual, quarterly, monthly, weekly respectively
-timeSeriesData <- ts(data, start=YEAR, frequency=12)
+ts_data <- ts(data, start=YEAR, frequency=12)
 
 # window(): extract subset of time series
 subset <- window(data, start=YEAR, end=YEAR)
 
 # time series plot
-plot(timeSeriesData)
+plot(ts_data)
 
 # plotting changes in time series data with diff()
-plot(diff(timeSeriesData))
+plot(diff(ts_data))
 ```
 
 
@@ -136,9 +136,9 @@ A white noise process is one with a mean zero and no correlation between its val
 
 ### Benchmark Forecasting methods
 ```r
-forecast1 <- meanf(timeSeriesData, h=11)
-forecast2 <- naive(timeSeriesData, h=11)
-forecast3 <- rwf(timeSeriesData, h=11, drift=T)
+forecast1 <- meanf(ts_data, h=11)
+forecast2 <- naive(ts_data, h=11)
+forecast3 <- rwf(ts_data, h=11, drift=T)
 
 plot(forecast1, PI=F)
 lines(forecast2$mean, col=2)
@@ -149,8 +149,8 @@ legend('topright', col=c(4,2,3), legend=c('Average', 'Naive', 'Drift'))
 
 ## Bias Adjustments
 ```r
-fc <- rwf(timeSeriesData, drift=T, lambda=0, h=50)
-fc2 <- rwf(timeSeriesData, drift=T, lambda=0, h=50, biasadj=T)
+fc <- rwf(ts_data, drift=T, lambda=0, h=50)
+fc2 <- rwf(ts_data, drift=T, lambda=0, h=50, biasadj=T)
 plot(fc)
 lines(fc2$mean)
 ```
@@ -158,16 +158,16 @@ lines(fc2$mean)
 
 ## Error Metrics
 ```r
-train <- window(timeSeriesData, end=100)
+train <- window(ts_data, end=100)
 forecast <- meanf(train, h=10)
-test <- window(timeSeriesData, start=101)
+test <- window(ts_data, start=101)
 accuracy(forecast, test)
 ```
 
 
 ## Time Series Cross Validation
 ```r
-e <- tsCV(timeSeriesData, rwf, drift=TRUE, h=1)
+e <- tsCV(ts_data, rwf, drift=TRUE, h=1)
 sqrt(mean(e^2, na.rm=TRUE))
-sqrt(mean(residuals(rwf(timeSeriesData, drift=TRUE))^2, na.rm=TRUE))
+sqrt(mean(residuals(rwf(ts_data, drift=TRUE))^2, na.rm=TRUE))
 ```
