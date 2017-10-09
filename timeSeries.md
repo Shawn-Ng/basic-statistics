@@ -9,13 +9,14 @@
         4. Cyclic: Exists when there are rises and falls that are not of a fixed period, average length of cycles is longer than the length of a seasonal pattern
     - Seasonal plots
         - Makes it easier to spot seasonal patterns than normal TS plot
-        - `seasonplot(ts_data)`
+        - `seasonplot(data_ts)`
     - Seasonal subseries plots
         - Emphasises the pattherns within each season. Useful for identifying changes within particular seasons
-        - `monthplot(ts_data)`
+        - `monthplot(data_ts)`
     - Lag plots
         - Checks whether a TS dataset is random
-        - `lag.plot(ts_data, lags=INTEGER, layout=c(), diag=BOOLEAN)`
+        - `lag.plot(data_ts, lags=INTEGER, layout=c(), diag=BOOLEAN)`
+
 2. Fundamental Time Series Model
     - [White Noise](#white-noise)
         1. mean function
@@ -25,27 +26,29 @@
         - `y_t = c + y_(t-1) + e_t`
         - constant mean but not variance
     - ACFs
-        - `acf(ts_data)`
+        - `acf(data_ts)`
         - Slow decrease in ACF as lags increase -> trend
         - Regular spikes -> seasonality
+
 3. [Benchmark Forecasting methods](#benchmark-forecasting-methods)
     - Average method
         - Forecasts of all future values are equal to the mean of the historical data
-        - `meanf(ts_data, h=VALUE)`
+        - `meanf(data_ts, h=VALUE)`
     - Naive method
         - Forecasts of all future values are equal to the most recent observation
-        - `naive(ts_data, h=VALUE)`
-        - `rwf(ts_data, h=VALUE, drift=T)`
+        - `naive(data_ts, h=VALUE)`
+        - `rwf(data_ts, h=VALUE, drift=T)`
         - rwf: random walk with drift
         - Naive method is potimal when data comes from random walk
     - Seasonal Naive Forecast
         - Forecast to be equal to the last observed value from the same season of the previous year
-        - `snaive(ts_data, h=VALUE)`
+        - `snaive(data_ts, h=VALUE)`
+
 4. Adjustments and Transformations
     - Calendar
         - Some of the the troughs are cause by different number of days in a month
         - To change from accumulated monthly production to daily production
-        - `plot(ts_data/monthdays(ts_data))`
+        - `plot(data_ts/monthdays(data_ts))`
     - Population
         - It is better to track number of units per 1000 people than total number of units
     - Inflation
@@ -54,10 +57,11 @@
     - Transformations
         1. Logarithms: Changes in a log value are relative (percent) changes on the original scale
         2. Box-Cox: Stabilising variance
-            - `data_tf <- BoxCox(ts_data, lambda=BoxCox.lambda(ts_data))`
+            - `data_tf <- BoxCox(data_ts, lambda=BoxCox.lambda(data_ts))`
             - `plot(data_tf)`
         3. Back-transforming Forecasts
         4. [Bias Adjustments](#bias-adjustments)
+
 5. Residual Diagnostics
     - Obs value - forecast/fitted value
     - 1 step ahead forecast
@@ -83,6 +87,7 @@
         2. Ljung-Box test
             - p-value < 0.05 -> not white noise
             - `Box.test(res, lag=10, fitdf=0, type="Lj")`
+
 6. Evaluating Forecast Accuracy
     - Training and Test Sets
         - Training data: Estimate the params of a model
@@ -106,29 +111,50 @@
                 - worse than naive forecast -> >1
     - [Time Series Cross Validation](#time-series-cross-validation)
         - More sophiscated version of training/test
+
 7. Prediction Intervals
     - 1 step ahead forecast -> forecast dis sd = residuals sd
     - No parameter estimated -> 2 sd identical
     - Parameter estimated -> forecast dis sd > residuals sd
     - Forecast h increase -> Prediction interval increase
 
+8. Time Series Component
+    - Time series = Seasonal component & trend-cycle component & remainder component
+    1. Additive decomposition: If seasonal component doesn't change with level of time series
+        - `$ y_t = S_t + T_t + R_t $`
+    2. Multiplicative decompsition:
+        - `$ y_t = S_t * T_t * R_t $`
 
+9. Moving Average Filters
+    - Estimate the trend-cycle
+        1. Linear filter: `diff()`
+        2. Moving average filter (m-MA): averages nearby values
+            - `ma(data_ts, order=VALUE)`
+            - Smoothed series capture the main movement of the time series without all of the minor fluctuations
+            - Higher order (m) -> smoother curve
+            - m is odd -> m-MA operation is symmetric
+            - m is even -> symmetry absent, take 1 obs more from future than past
+                - Centred moving average: `2 x m-MA`
+
+10. Decomposition Algorithms
+
+11. Forecasting and Decomposition
 
 
 
 ### Time series patterns
 ```r
 # frequency=1,4,12,52 are annual, quarterly, monthly, weekly respectively
-ts_data <- ts(data, start=c(YEAR, QUARTER), frequency=12)
+data_ts <- ts(data, start=c(YEAR, QUARTER), frequency=12)
 
 # window(): extract subset of time series
 subset <- window(data, start=c(YEAR, QUARTER), end=c(YEAR, QUARTER))
 
 # time series plot
-plot(ts_data)
+plot(data_ts)
 
 # plotting changes in time series data with diff()
-plot(diff(ts_data))
+plot(diff(data_ts))
 ```
 
 
@@ -140,9 +166,9 @@ A white noise process is one with a mean zero and no correlation between its val
 
 ### Benchmark Forecasting methods
 ```r
-forecast1 <- meanf(ts_data, h=11)
-forecast2 <- naive(ts_data, h=11)
-forecast3 <- rwf(ts_data, h=11, drift=T)
+forecast1 <- meanf(data_ts, h=11)
+forecast2 <- naive(data_ts, h=11)
+forecast3 <- rwf(data_ts, h=11, drift=T)
 
 plot(forecast1, PI=F)
 lines(forecast2$mean, col=2)
@@ -153,8 +179,8 @@ legend('topright', col=c(4,2,3), legend=c('Average', 'Naive', 'Drift'))
 
 ## Bias Adjustments
 ```r
-fc <- rwf(ts_data, drift=T, lambda=0, h=50)
-fc2 <- rwf(ts_data, drift=T, lambda=0, h=50, biasadj=T)
+fc <- rwf(data_ts, drift=T, lambda=0, h=50)
+fc2 <- rwf(data_ts, drift=T, lambda=0, h=50, biasadj=T)
 plot(fc)
 lines(fc2$mean)
 ```
@@ -162,16 +188,16 @@ lines(fc2$mean)
 
 ## Error Metrics
 ```r
-train <- window(ts_data, end=100)
+train <- window(data_ts, end=100)
 forecast <- meanf(train, h=10)
-test <- window(ts_data, start=101)
+test <- window(data_ts, start=101)
 accuracy(forecast, test)
 ```
 
 
 ## Time Series Cross Validation
 ```r
-e <- tsCV(ts_data, rwf, drift=TRUE, h=1)
+e <- tsCV(data_ts, rwf, drift=TRUE, h=1)
 sqrt(mean(e^2, na.rm=TRUE))
-sqrt(mean(residuals(rwf(ts_data, drift=TRUE))^2, na.rm=TRUE))
+sqrt(mean(residuals(rwf(data_ts, drift=TRUE))^2, na.rm=TRUE))
 ```
