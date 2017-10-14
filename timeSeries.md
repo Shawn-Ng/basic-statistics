@@ -128,13 +128,17 @@
 9. Moving Average Filters
     - Estimate the trend-cycle
         1. Linear filter: `diff()`
-        2. Moving average filter (m-MA): averages nearby values
-            - `ma(data_ts, order=VALUE)`
+        2. Moving average of order m (m-MA): averages nearby values
             - Smoothed series capture the main movement of the time series without all of the minor fluctuations
             - Higher order (m) -> smoother curve
+            - 2x12-MA for monthly data and 7-MA for daily data
             - m is odd -> m-MA operation is symmetric
-            - m is even -> symmetry absent, take 1 obs more from future than past
+                - `ma(data_ts, order=VALUE)`
+            - Centred moving average: m is even 
+                - Symmetry absent, take 1 obs more from future than past
                 - Centred moving average: `2 x m-MA`
+                - `ma(data_ts, order=2, centre=FALSE)`
+        3. Weighted moving averages: smoother estimates than simple moving averages
 
 10. Decomposition Algorithms
 
