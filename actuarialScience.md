@@ -11,3 +11,9 @@ Chapter 8
 	2. Franchise deductible: when loss x > deductible d, loss is paid in full. Modifies the ordinary deductible by adding the deductible when there is a positive amount paid
 		- expected cost per loss: `E(Y^L) = E(X) - E(X ^ d) + d(1 - F(d))`
 		- expected cost per payment: `E(Y^P) = E(Y^L) / (1 - F(d))`
+2. Loss elimination ratio
+	- The loss elimination ratio is the ratio of the decrease in the expected payment with an ordinary deductible to the expected payment without the deductible
+	- `LER = E(X ^ d) / E(X)`
+3. Inflation
+	- For an ordinary deductible of d, after uniform inflation of 1 + r, the expected cost per loss is `(1+r){E(X) - E(X ^ d*)}`
+	- `d* = d / (1+r)`
