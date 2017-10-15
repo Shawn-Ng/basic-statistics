@@ -17,3 +17,9 @@ Chapter 8
 3. Inflation
 	- For an ordinary deductible of d, after uniform inflation of 1 + r, the expected cost per loss is `(1+r){E(X) - E(X ^ d*)}`
 	- `d* = d / (1+r)`
+4. Policy limit
+	- Opposite of deductible, right censored r.v.
+	- loss < u, pay full loss
+	- loss > u, pay u
+	- Per loss and per payment is not relevant
+	- Inflation: `(1+r) E(X ^ u/(1+r))`
