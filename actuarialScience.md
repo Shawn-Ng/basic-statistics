@@ -22,4 +22,9 @@ Chapter 8
 	- loss < u, pay full loss
 	- loss > u, pay u
 	- Per loss and per payment is not relevant
-	- Inflation: `(1+r) E(X ^ u/(1+r))`
+	- For a policy limit of u, after uniform inflation of `1 + r`, the expected cost is: `(1+r) E(X ^ u/(1+r))`
+5. Coinsurance
+	- Insurance company pay `alpha` of the loss and policyholder pays the remaining.
+	- `E(Y^L) = alpha x (1+r) x [E(X ^ u*) - E(X ^ d*)]`, `u* = u/(1+r)`, `d* = d/(1+r)`
+	- `E(Y^P) = E(Y^L) / (1-Fx(d*))`
+	- `E((Y^L)^2) = alpha^2 x (1+r)^2 x {E[(X ^ u*)^2] - E[(X ^ d*)^2]} - 2d*[E(X ^ u*) - E(X ^ d*)]`
