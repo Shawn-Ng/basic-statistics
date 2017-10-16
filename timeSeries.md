@@ -139,6 +139,9 @@
                 - Centred moving average: `2 x m-MA`
                 - `ma(data_ts, order=2, centre=FALSE)`
         3. Weighted moving averages: smoother estimates than simple moving averages
+            - `x <- 1:10`
+            - `y <- ts(x^2)`
+            - `stats::filter(y, c(-6/70 , 24/70 , 17/35 , 24/70 , -6/70))`
 
 10. Decomposition Algorithms
 
