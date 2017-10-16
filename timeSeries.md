@@ -160,7 +160,9 @@
         - `fit <- stl(data_ts, t.window=VALUE, s.window="periodic", robust=BOOLEAN)`
 
 11. Forecasting and Decomposition
-
+    - `fit <- stl(data_ts, t.window=VALUE, s.window="periodic", robust=BOOLEAN)`
+    - `fc <- forecast(fit, method="naive")`
+    - `plot(fc)`
 
 
 ### Time series patterns
