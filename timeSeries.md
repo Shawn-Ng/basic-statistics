@@ -144,6 +144,15 @@
             - `stats::filter(y, c(-6/70 , 24/70 , 17/35 , 24/70 , -6/70))`
 
 10. Decomposition Algorithms
+    1. Addictive decomposition
+        - de-trended series: `y_t - \hatT_t`
+        - Calculate the remainder component: `\hatR_t = y_t - \hatT_t - \hatS_t`
+        - Constraint seasonal effects to sum to 0
+    2. Multiplicative decomposition
+        - de-trended series: `y_t / \hatT_t`
+        - Calculate the remainder component: `\hatR_t = y_t / (\hatT_t * \hatS_t)`
+        - Adjusted seasonal effects so they sum to m -> the average of the seasonal effects is 1;
+        - `data_d <- decompose(data_ts, type="multiplicative")`
 
 11. Forecasting and Decomposition
 
