@@ -153,6 +153,11 @@
         - Calculate the remainder component: `\hatR_t = y_t / (\hatT_t * \hatS_t)`
         - Adjusted seasonal effects so they sum to m -> the average of the seasonal effects is 1;
         - `data_d <- decompose(data_ts, type="multiplicative")`
+    3. X11-decomposition
+        - `library(seasonal)`
+        - `fit <- seas(data_ts, x11="")`
+    4. Seasonal and trend (STL) decomposition using loess (locally weighted regression model)
+        - `fit <- stl(data_ts, t.window=VALUE, s.window="periodic", robust=BOOLEAN)`
 
 11. Forecasting and Decomposition
 
