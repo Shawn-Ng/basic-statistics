@@ -211,8 +211,8 @@ autoplot(fc) + autolayer(fitted(fc))
 ```r
 train <- subset.ts(ts_data, end=length(ts_data)-length(test))
 
-fcSes <- naive(train, h=PERIOD)
-fcNaive <- ses(train, h=PERIOD)
+fcSes <- ses(train, h=PERIOD)
+fcNaive <- naive(train, h=PERIOD)
 accuracy(fcSes, ts_data)
 accuracy(fcNaive, ts_data)
 ```
