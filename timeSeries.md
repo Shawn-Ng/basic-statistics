@@ -166,6 +166,18 @@
     - `fc <- forecast(fit, method="naive")`
     - `plot(fc)`
 
+12. Exponential Smoothing
+    - A forecasting method is an algorithm that provides a point forecast
+    - A statistical model defines a process that generates the data
+    - Use of a model allows us to compute prediction intervals
+    - For exponential smoothing methods, the type of error does not make any difference - the point forecasts will be the same
+    - 5 trend types, local level `l` local growth `b`:
+        1. None: `T_h = l`
+        2. Addictive: `T_h = l + bh`
+        3. Addictive damped: `T_h = l + (\phi + \phi^2 + ... + \phi^h)b`
+        4. Multiplicative: `T_h = l*b^h`
+        5. Multiplicative damped: `T_h = l*b^(\phi + \phi^2 + ... + \phi^h)`
+
 
 ### Time series patterns
 ```r
