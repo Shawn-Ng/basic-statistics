@@ -157,6 +157,8 @@
         - `library(seasonal)`
         - `fit <- seas(data_ts, x11="")`
     4. Seasonal and trend (STL) decomposition using loess (locally weighted regression model)
+        - Advantage: able to estimate non-linear relationships, handle any type of seasonality, can be made robust to outliers
+        - Disadvantage: can only handle additive models (can overcome this by transforming the model first), several parameters
         - `fit <- stl(data_ts, t.window=VALUE, s.window="periodic", robust=BOOLEAN)`
 
 11. Forecasting and Decomposition
