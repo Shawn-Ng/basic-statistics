@@ -181,7 +181,13 @@
         - The forecast is a weighted average of all past observations
         - `fc <- ses(data_ts, h=5, alpha=0.8, initial="simple")`
     2. Holt's linear method (A, N)
-        
+        - The forecast is a linear function of h
+        - `fc <- holt(data_ts, h=5, alpha=0.8, beta=0, initial="simple")`
+    3. Addictive damped method (A_d, N)
+        - The damped method introduces a parameter that weakens the trend
+        - Short term, forecasts have a trend, long term, they are constant
+        - When damping parameter \phi = 1, it becomes Holt's linear method, \phi is rarely < 0.8
+        - `fc <- holt(data_ts, h=15, damped=T, phi=0.9)`
 
 
 ### Time series patterns
