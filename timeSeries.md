@@ -188,6 +188,12 @@
         - Short term, forecasts have a trend, long term, they are constant
         - When damping parameter \phi = 1, it becomes Holt's linear method, \phi is rarely < 0.8
         - `fc <- holt(data_ts, h=15, damped=T, phi=0.9)`
+    4. Additive seasonality (A, A)
+        - Addictive method: seasonal variations roughly constant
+        - `fc <- hw(data_ts, seasonal="addictive")`
+    5. Multiplicative seasonality (A, M)
+        - Multiplicative method: seasonal variations change proportionally to the level
+        - `fc <- hw(data_ts, seasonal="multiplicative")`
 
 
 ### Time series patterns
