@@ -241,6 +241,14 @@ zeros or negative values
         - `fit <- ets(data_ts)`
         - `fc <- forecast(fit, h=12, level=90)`
 
+16. Stationary
+    - A weakly stationary time series is a finite variance process such that mean is a constant and `cov(y_s,y_t)` depends on `s` and `t` only through `s-t`
+    - A stationary time series (e.g. WN) is (a) roughly horizontal (b) constant variance (c) no predictable pattern in long terms
+    - Identify non-stationary series:
+        - timeplot shows mean and variance are not constant
+        - ACF plots
+            - Stationary series ACF drops to 0 quickly, while non-stationary series decreases slowly
+
 
 ### Time series patterns
 ```r
