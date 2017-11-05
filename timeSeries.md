@@ -188,12 +188,35 @@
         - Short term, forecasts have a trend, long term, they are constant
         - When damping parameter \phi = 1, it becomes Holt's linear method, \phi is rarely < 0.8
         - `fc <- holt(data_ts, h=15, damped=T, phi=0.9)`
-    4. Additive seasonality (A, A)
+    4. Additive Holt-Winters method (A, A)
         - Addictive method: seasonal variations roughly constant
         - `fc <- hw(data_ts, seasonal="addictive")`
-    5. Multiplicative seasonality (A, M)
+    5. Multiplicative Holt-Winters method (A, M)
         - Multiplicative method: seasonal variations change proportionally to the level
         - `fc <- hw(data_ts, seasonal="multiplicative")`
+    6. Exponential trend method (M, N)
+    7. Multiplicative damped trend method (M_d, A)
+
+13. State Space Models
+    - For each forecast methods, there are 2 state space models: additive and multiplicative errors
+    - Point forecasts will be same for both, but different intervals
+    - `(Error, Trend, Seasonality)`
+    - The models with multiplicative error/trend/seasonality are numerically unstable when the data values contain
+zeros or negative values
+    - The residuals are the estimates of the innovation errors. For the state space models with additive errors, these are identical to the one-step forecast errors. For models with multiplicative errors, these two quantities are not the same
+    - `model <- ets(data_ts, "ETS")`
+    - `RESIDUALS <- residuals(model)`
+    - `fc_errors <- residuals(model, type="response")`
+    - In any state space model, the initial state `x0` and the parameters are unknown
+    - We need to estimate:
+        - Smoothing parameters, `alpha, beta` for ETS model
+        - Initial state: `x0`
+        - Innovations variance: `sigma^2`
+    - Some approaches to estimate parameters:
+        - Likelihood function: `fit_mle <- ets(data_ts, "ANN")`
+        - Log-likelihood function
+        - Minimising the one-step MSE, MAE or some other error metric: `fit_mae <- ets(data_ts, "ANN", opt.crit="mae")`
+        - Minimise the residual variance
 
 
 ### Time series patterns
