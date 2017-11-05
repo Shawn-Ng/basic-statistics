@@ -218,6 +218,29 @@ zeros or negative values
         - Minimising the one-step MSE, MAE or some other error metric: `fit_mae <- ets(data_ts, "ANN", opt.crit="mae")`
         - Minimise the residual variance
 
+14. Prediction Intervals
+    - `fit1 <- ets(data_ts, "AAA")`
+    - 95% interval: `fc1_aaa <- forecast(fit1, h=12, level-0.95)`
+    - Simulation for 95% interval: `fc2_aaa <- forecast(fit1, h=12, level-0.95)`
+
+15. Model Selection: to choose the best model
+    - Potential problems:
+        - Test set is too small to draw reliable conclusions
+        - Diffcult to decide which error metric to use
+    - Steps:
+        - Split the time series into a training and test set
+        - Fit each model using the training set (via MLE)
+        - Assess the forecast accuracy of each model using the test set
+        - Choose the model with the lowest forecast accuracy
+        - Refit the chosen model to the full time series and use these new parameters for forecasting future observations
+    - Or use cross validation to get the best model
+    - Or use penalized likelihood method
+        - The model with the highest likelihood is chosen as the best one. However, the likelihood is penalised for the number of parameters used. A model with more parameters is penalised more than one with fewer parameters
+        - Akaike Information Criteria (AIC)
+        - Bayes Information Criteria (BIC)
+        - `fit <- ets(data_ts)`
+        - `fc <- forecast(fit, h=12, level=90)`
+
 
 ### Time series patterns
 ```r
