@@ -245,9 +245,26 @@ zeros or negative values
     - A weakly stationary time series is a finite variance process such that mean is a constant and `cov(y_s,y_t)` depends on `s` and `t` only through `s-t`
     - A stationary time series (e.g. WN) is (a) roughly horizontal (b) constant variance (c) no predictable pattern in long terms
     - Identify non-stationary series:
-        - timeplot shows mean and variance are not constant
+        - Timeplot shows mean and variance are not constant
         - ACF plots
             - Stationary series ACF drops to 0 quickly, while non-stationary series decreases slowly
+    - Transformations: stabilize the variance of a time series
+    - Differencing: stabilizes the mean of a time series by removing changes in the level of a time series
+        - `plot(data_ts)`
+        - `acf(data_ts)`
+        - `plot(diff(data_ts))`
+        - `acf(diff(data_ts))`
+    - Seasonal difference is the difference between an observation and the corresponding observation from the previous year
+        - `data_log <- log(data_ts)`
+        - `data_logdiff <- diff(data_log, 12)`
+        - `plot(data_logdiff, main="Differenced Log - Transform")`
+    - Unit root testing: determine the required order of differencing
+        1. Augmented Dickey Fuller (ADF) test: H0 is that the data are non-stationary and non-seasonal
+            - small p-value -> stationary
+            - `library(tseries)`
+            - `adf.test(data_ts)`
+        2. [Kwiatkowski-Phillips-Schmidt-Shin (KPSS) test](#kwiatkowski-phillips-schmidt-shin-kpss-test): H0 is that the data are stationary and non-seasonal
+            - small p-value -> non-stationary
 
 
 ### Time series patterns
@@ -308,4 +325,17 @@ accuracy(forecast, test)
 e <- tsCV(data_ts, rwf, drift=TRUE, h=1)
 sqrt(mean(e^2, na.rm=TRUE))
 sqrt(mean(residuals(rwf(data_ts, drift=TRUE))^2, na.rm=TRUE))
+```
+
+
+### Kwiatkowski-Phillips-Schmidt-Shin (KPSS) test
+```r
+ns <- nsdiffs (x) # Check seasonal and apply
+if(ns > 0)
+    xstar <- diff (x,lag= frequency (x), differences =ns)
+else
+    xstar <- x
+nd <- ndiffs ( xstar ) # Check first order and apply
+if(nd > 0)
+    xstar <- diff (xstar , differences =nd)
 ```
