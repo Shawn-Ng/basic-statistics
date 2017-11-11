@@ -285,6 +285,8 @@ zeros or negative values
     - Partial autocorrelation function (PACF): meaures relationship between `y_t` and `y_t-k` when time lag effects removed
         - `tsdisplay(data_ts[,1])`
         - `auto.arima(data_ts[,1],seasonal=FALSE, stepwise=TRUE, approximation=FALSE)`
+    - Non-zero constant c in the ARIMA model: assume a polynomial trend of order d in the forecast function
+    - c = 0, the forecast function includes a polynomial trend of order d
 
 
 ### Time series patterns
