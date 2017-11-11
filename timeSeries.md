@@ -265,6 +265,7 @@ zeros or negative values
             - `adf.test(data_ts)`
         2. [Kwiatkowski-Phillips-Schmidt-Shin (KPSS) test](#kwiatkowski-phillips-schmidt-shin-kpss-test): H0 is that the data are stationary and non-seasonal
             - small p-value -> non-stationary
+    - Backward shift operator: describe the process of differencing
 
 
 ### Time series patterns
