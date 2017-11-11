@@ -282,6 +282,9 @@ zeros or negative values
         - `plot(forecast(fit,h=10), include=80)`
         - Higher the value of d, the more rapidly the forecast intervals increase in size
         - d = 0, long term forecast sd goes to sd
+    - Partial autocorrelation function (PACF): meaures relationship between `y_t` and `y_t-k` when time lag effects removed
+        - `tsdisplay(data_ts[,1])`
+        - `auto.arima(data_ts[,1],seasonal=FALSE, stepwise=TRUE, approximation=FALSE)`
 
 
 ### Time series patterns
