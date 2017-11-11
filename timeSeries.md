@@ -267,6 +267,15 @@ zeros or negative values
             - small p-value -> non-stationary
     - Backward shift operator: describe the process of differencing
 
+17. ARIMA model
+    - Autoregressive AR(p) model
+        - Multiple linear regression with lagged values of `y_t` as predictors, `e_t` is white noise and its variance will only change the scale of the series, not the patterns
+    - Moving average MA(q) model
+        - Each value of `y_t` as a weighted moving average of the past few forecast errors, `e_t` is white noise and its variance will only change the scale of the series, not the patterns
+        - MA(q) VS m-MA smoothing
+            - m-MA smoothing is used for estimating the trend-cycle of past values. It is a linear filter
+            - MA(q) model is used for forecasting future values
+
 
 ### Time series patterns
 ```r
