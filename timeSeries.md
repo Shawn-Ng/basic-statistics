@@ -275,6 +275,13 @@ zeros or negative values
         - MA(q) VS m-MA smoothing
             - m-MA smoothing is used for estimating the trend-cycle of past values. It is a linear filter
             - MA(q) model is used for forecasting future values
+    - Autoregressive moving average (ARMA) model: combination of AR(p) and MA(q) models
+        - Predictors: lagged values `y_t` and lagged errors
+    - ARIMA (p,q,d) model = ARMA combine with differencing
+        - `fit <- auto.arima(uschange[,1], max.P=0, max.Q=0, D=0)`
+        - `plot(forecast(fit,h=10), include=80)`
+        - Higher the value of d, the more rapidly the forecast intervals increase in size
+        - d = 0, long term forecast sd goes to sd
 
 
 ### Time series patterns
