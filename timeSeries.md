@@ -20,7 +20,7 @@
 2. Fundamental Time Series Model
     - [White Noise](#white-noise)
         1. Mean function
-        2. autocovariance function
+        2. Autocovariance function
     - Random Walk
         - current step = drift + previous step + white noise
         - `y_t = c + y_(t-1) + e_t`
