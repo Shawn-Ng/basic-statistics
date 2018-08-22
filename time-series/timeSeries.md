@@ -271,6 +271,7 @@ plot(fc)
 4. Multiplicative: `T_h = l*b^h`
 5. Multiplicative damped: `T_h = l*b^(\phi + \phi^2 + ... + \phi^h)`
 
+### Methods
 1. Simple exponential smoothing (N, N)
     - The forecast is a weighted average of all past observations
     - `fc <- ses(ts_data, h=5, alpha=0.8, initial="simple")`
