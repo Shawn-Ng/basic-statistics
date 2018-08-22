@@ -13,7 +13,7 @@
 11. [Forecasting and decomposition](#forecasting-and-decomposition)
 12. [Exponential smoothing](#exponential-smoothing)
 13. [State space models](#state-space-models)
-14. [Prediction intervals](#prediction-intervals)
+14. Prediction intervals
 15. [Model selection](#model-selection)
 16. [Stationary](#stationary)
 17. [ARIMA model](#arima-model)
@@ -132,33 +132,36 @@ lines(fc2$mean)
 - Residual also known as training error
 - Residual values: `fc_data$residuals`
 - Fitted values: `fc_data$fitted`
-- Residual Properties
-    + If properties are not met -> forecast method can be improved
-    1. Essential
-        - Uncorrelated
-        - 0 mean
-    2. Useful
-        - Constant variance
-        - Normally distributed
+
+### Residual Properties
+If properties are not met -> forecast method can be improved
+1. Essential
+    - Uncorrelated
+    - 0 mean
+2. Useful
+    - Constant variance
+    - Normally distributed
+
 - Residual correlated -> ARIMA
 - Residual with non 0 mean -> add mean to all forecast
 - `checkresiduals(naive(fc_data),test=FALSE)`
-- Portmanteau tests
-    + Test of whether the first h autocorrelations, are significantly different from what would be expected from a white noise process
-    + `res <- residuals(naive(data))`
-    1. Box-Pierce test
-        - `Box.test(res, lag=10, fitdf=0)`
-    2. Ljung-Box test
-        - p-value < 0.05 -> not white noise
-        - `Box.test(res, lag=10, fitdf=0, type="Lj")`
+
+### Portmanteau tests
+- Test of whether the first h autocorrelations, are significantly different from what would be expected from a white noise process
+- `res <- residuals(naive(data))`
+
+1. Box-Pierce test
+    - `Box.test(res, lag=10, fitdf=0)`
+2. Ljung-Box test
+    - p-value < 0.05 -> not white noise
+    - `Box.test(res, lag=10, fitdf=0, type="Lj")`
 
 
 ## Evaluating forecast accuracy
-- Training and test sets
-    + Training data: Estimate the params of a model
-    + Test data: Evaluate model's accuracy
-    + Good fit to training data != model forecast well
-    + Enough params -> perfect fit, but don't overfit
+- Training data: Estimate the params of a model
+- Test data: Evaluate model's accuracy
+- Good fit to training data != model forecast well
+- Enough params -> perfect fit, but don't overfit
 
 ### Error metrics
 ```r
@@ -168,19 +171,21 @@ test <- window(ts_data, start=101)
 accuracy(forecast, test)
 ```
 - `forecast error = diff(obs value - forecast)`
-- Scale dependent error
-    1. Mean Absolute Error (MAE), low MAE -> optimal forecast of median
-    2. Root Mean Square Error (RMSE), low RMSE -> optimal forecast of mean
-- Scale independent error
-    1. Mean Absolute Percentage Error (MAPE)
-        - If forecast ~ 0 -> extreme percentage error
-        - Heavier penalty on -ve than +ve error
-    2. Symmetric MAPE (sMAPE)
-        - Range from -200% to 200%
-        - Computationally unstable, could be negative
-    3. Scaled Error
-        - better than naive forecast -> <1
-        - worse than naive forecast -> >1
+
+### Scale dependent error
+1. Mean Absolute Error (MAE), low MAE -> optimal forecast of median
+2. Root Mean Square Error (RMSE), low RMSE -> optimal forecast of mean
+
+### Scale independent error
+1. Mean Absolute Percentage Error (MAPE)
+    - If forecast ~ 0 -> extreme percentage error
+    - Heavier penalty on -ve than +ve error
+2. Symmetric MAPE (sMAPE)
+    - Range from -200% to 200%
+    - Computationally unstable, could be negative
+3. Scaled Error
+    - better than naive forecast -> <1
+    - worse than naive forecast -> >1
 
 ### Time Series Cross Validation
 ```r
@@ -207,23 +212,23 @@ sqrt(mean(residuals(rwf(ts_data, drift=TRUE))^2, na.rm=TRUE))
 
 
 ## Moving average filters
-- Estimate the trend-cycle
-    1. Linear filter: `diff()`
-    2. Moving average of order m (m-MA): averages nearby values
-        - Smoothed series capture the main movement of the time series without all of the minor fluctuations
-        - Higher order (m) -> smoother curve
-        - 2x12-MA for monthly data and 7-MA for daily data
-        - m is odd -> m-MA operation is symmetric
-            + `ma(ts_data, order=VALUE)`
-        - Centred moving average: m is even 
-            + Symmetry absent, take 1 obs more from future than past
-            + Centred moving average: `2 x m-MA`
-            + `ma(ts_data, order=2, centre=FALSE)`
-    3. Weighted moving averages
-        - smoother estimates than simple moving averages
-        - `x <- 1:10`
-        - `y <- ts(x^2)`
-        - `stats::filter(y, c(-6/70 , 24/70 , 17/35 , 24/70 , -6/70))`
+### Estimate the trend-cycle
+1. Linear filter: `diff()`
+2. Moving average of order m (m-MA): averages nearby values
+    - Smoothed series capture the main movement of the time series without all of the minor fluctuations
+    - Higher order (m) -> smoother curve
+    - 2x12-MA for monthly data and 7-MA for daily data
+    - m is odd -> m-MA operation is symmetric
+        + `ma(ts_data, order=VALUE)`
+    - Centred moving average: m is even 
+        + Symmetry absent, take 1 obs more from future than past
+        + Centred moving average: `2 x m-MA`
+        + `ma(ts_data, order=2, centre=FALSE)`
+3. Weighted moving averages
+    - smoother estimates than simple moving averages
+    - `x <- 1:10`
+    - `y <- ts(x^2)`
+    - `stats::filter(y, c(-6/70 , 24/70 , 17/35 , 24/70 , -6/70))`
 
 
 ## Decomposition algorithms
@@ -258,12 +263,14 @@ plot(fc)
 - A statistical model defines a process that generates the data
 - Use of a model allows us to compute prediction intervals
 - For exponential smoothing methods, the type of error does not make any difference - the point forecasts will be the same
-- 5 trend types, local level `l` local growth `b`:
-    1. None: `T_h = l`
-    2. Addictive: `T_h = l + bh`
-    3. Addictive damped: `T_h = l + (\phi + \phi^2 + ... + \phi^h)b`
-    4. Multiplicative: `T_h = l*b^h`
-    5. Multiplicative damped: `T_h = l*b^(\phi + \phi^2 + ... + \phi^h)`
+
+### 5 trend types, local level `l` local growth `b`:
+1. None: `T_h = l`
+2. Addictive: `T_h = l + bh`
+3. Addictive damped: `T_h = l + (\phi + \phi^2 + ... + \phi^h)b`
+4. Multiplicative: `T_h = l*b^h`
+5. Multiplicative damped: `T_h = l*b^(\phi + \phi^2 + ... + \phi^h)`
+
 1. Simple exponential smoothing (N, N)
     - The forecast is a weighted average of all past observations
     - `fc <- ses(ts_data, h=5, alpha=0.8, initial="simple")`
@@ -292,9 +299,13 @@ plot(fc)
 - The models with multiplicative error/trend/seasonality are numerically unstable when the data values contain
 zeros or negative values
 - The residuals are the estimates of the innovation errors. For the state space models with additive errors, these are identical to the one-step forecast errors. For models with multiplicative errors, these two quantities are not the same
-- `model <- ets(ts_data, "ETS")`
-- `RESIDUALS <- residuals(model)`
-- `fc_errors <- residuals(model, type="response")`
+
+```r
+model <- ets(ts_data, "ETS")
+RESIDUALS <- residuals(model)
+fc_errors <- residuals(model, type="response")
+```
+
 - In any state space model, the initial state `x0` and the parameters are unknown
 - We need to estimate:
     + Smoothing parameters, `alpha, beta` for ETS model
@@ -321,21 +332,26 @@ fc2_aaa <- forecast(fit1, h=12, level-0.95)
 
 ## Model selection
 - To choose the best model
-- Potential problems:
-    + Test set is too small to draw reliable conclusions
-    + Diffcult to decide which error metric to use
-- Steps:
-    + Split the time series into a training and test set
-    + Fit each model using the training set (via MLE)
-    + Assess the forecast accuracy of each model using the test set
-    + Choose the model with the lowest forecast accuracy
-    + Refit the chosen model to the full time series and use these new parameters for forecasting future observations
+
+### Potential problems:
+- Test set is too small to draw reliable conclusions
+- Diffcult to decide which error metric to use
+
+### Steps:
+- Split the time series into a training and test set
+- Fit each model using the training set (via MLE)
+- Assess the forecast accuracy of each model using the test set
+- Choose the model with the lowest forecast accuracy
+- Refit the chosen model to the full time series and use these new parameters for forecasting future observations
+
 - OR use cross validation to get the best model
 - OR use penalized likelihood method
-    + The model with the highest likelihood is chosen as the best one.
-    + However, the likelihood is penalised for the number of parameters used. A model with more parameters is penalised more than one with fewer parameters
-    + Akaike Information Criteria (AIC)
-    + Bayes Information Criteria (BIC)
+
+### Penalized likelihood method
+- The model with the highest likelihood is chosen as the best one.
+- However, the likelihood is penalised for the number of parameters used. A model with more parameters is penalised more than one with fewer parameters
+- Akaike Information Criteria (AIC)
+- Bayes Information Criteria (BIC)
 
 ```r
 fit <- ets(ts_data)
@@ -346,10 +362,12 @@ fc <- forecast(fit, h=12, level=90)
 ## Stationary
 - A weakly stationary time series is a finite variance process such that mean is a constant and `cov(y_s,y_t)` depends on `s` and `t` only through `s-t`
 - A stationary time series (e.g. WN) is (a) roughly horizontal (b) constant variance (c) no predictable pattern in long terms
-- Identify non-stationary series:
-    + Timeplot shows mean and variance are not constant
-    + ACF plots
-        * Stationary series ACF drops to 0 quickly, while non-stationary series decreases slowly
+
+### Identify non-stationary series:
+- Timeplot shows mean and variance are not constant
+- ACF plots
+    + Stationary series ACF drops to 0 quickly, while non-stationary series decreases slowly
+
 - Transformations: stabilize the variance of a time series
 - Differencing: stabilizes the mean of a time series by removing changes in the level of a time series
 
@@ -393,23 +411,30 @@ Backward shift operator: describe the process of differencing
 
 
 ## ARIMA model
-- Autoregressive AR(p) model
-    - Multiple linear regression with lagged values of `y_t` as predictors, `e_t` is white noise and its variance will only change the scale of the series, not the patterns
-- Moving average MA(q) model
-    - Each value of `y_t` as a weighted moving average of the past few forecast errors, `e_t` is white noise and its variance will only change the scale of the series, not the patterns
-    - MA(q) VS m-MA smoothing
-        - m-MA smoothing is used for estimating the trend-cycle of past values. It is a linear filter
-        - MA(q) model is used for forecasting future values
-- Autoregressive moving average (ARMA) model: combination of AR(p) and MA(q) models
-    - Predictors: lagged values `y_t` and lagged errors
-- ARIMA (p,q,d) model = ARMA combine with differencing
-    - `fit <- auto.arima(uschange[,1], max.P=0, max.Q=0, D=0)`
-    - `plot(forecast(fit,h=10), include=80)`
-    - Higher the value of d, the more rapidly the forecast intervals increase in size
-    - d = 0, long term forecast sd goes to sd
-- Partial autocorrelation function (PACF): meaures relationship between `y_t` and `y_t-k` when time lag effects removed
-    - `tsdisplay(ts_data[,1])`
-    - `auto.arima(ts_data[,1],seasonal=FALSE, stepwise=TRUE, approximation=FALSE)`
+### Autoregressive AR(p) model
+- Multiple linear regression with lagged values of `y_t` as predictors, `e_t` is white noise and its variance will only change the scale of the series, not the patterns
+
+### Moving average MA(q) model
+- Each value of `y_t` as a weighted moving average of the past few forecast errors, `e_t` is white noise and its variance will only change the scale of the series, not the patterns
+- MA(q) VS m-MA smoothing
+    + m-MA smoothing is used for estimating the trend-cycle of past values. It is a linear filter
+    + MA(q) model is used for forecasting future values
+
+### Autoregressive moving average (ARMA) model
+- Combination of AR(p) and MA(q) models
+- Predictors: lagged values `y_t` and lagged errors
+
+### ARIMA (p,q,d) model = ARMA combine with differencing
+```r
+fit <- auto.arima(uschange[,1], max.P=0, max.Q=0, D=0)
+plot(forecast(fit,h=10), include=80)
+```
+- Higher the value of d, the more rapidly the forecast intervals increase in size
+- d = 0, long term forecast sd goes to sd
+
+### Partial autocorrelation function (PACF): meaures relationship between `y_t` and `y_t-k` when time lag effects removed
+- `tsdisplay(ts_data[,1])`
+- `auto.arima(ts_data[,1],seasonal=FALSE, stepwise=TRUE, approximation=FALSE)`
+
 - Non-zero constant c in the ARIMA model: assume a polynomial trend of order d in the forecast function
 - c = 0, the forecast function includes a polynomial trend of order d
-
